@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#1a1a1a">
+
+  <title>Portfólio Premium | Pacheco Gesso e Drywall</title>
+  <meta name="description" content="Galeria de projetos realizados em gesso e drywall por Joel Pacheco Machado. Qualidade excepcional em Curitiba e Região.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --dark:       #1e1e1e;
+      --darker:     #121212;
+      --gold:       #C4A882;
+      --gold-d:     #A8895F;
+      --white:      #ffffff;
+      --light:      #F7F5F2;
+      --gray:       #888;
+      --radius:     24px;
+      --radius-sm:  12px;
+      --glass:      rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--darker);
+      color: var(--white);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { text-decoration:none; color:inherit; }
+
+    /* CUSTOM CURSOR (Optional subtle touch) */
+    ::selection { background: var(--gold); color: var(--darker); }
+
+    /* NAVBAR */
+    nav {
+      position: fixed; top:0; left:0; right:0;
+      z-index: 999;
+      display: flex; align-items:center; justify-content:space-between;
+      padding: 18px 30px;
+      background: rgba(18,18,18,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .nav-logo { display:flex; align-items:center; gap:12px; }
+    .nav-logo-text {
+      color: #fff;
+      font-size: 14px; font-weight: 800; letter-spacing:1.8px; line-height:1.2;
+    }
+    .nav-logo-text small {
+      display: block;
+      color: var(--gold);
+      font-size: 9px; font-weight:500; letter-spacing:3px;
+    }
+    .btn-back {
+      background: var(--gold);
+      color: var(--darker);
+      font-size: 12px; font-weight: 800;
+      padding: 10px 22px;
+      border-radius: 50px;
+      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; align-items:center; gap:8px;
+    }
+    .btn-back:hover { background:#fff; transform:translateX(-5px); }
+
+    /* HEADER */
+    header {
+      padding: 160px 22px 80px;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .header-bg {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(196,168,130,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .badge-pt {
+      display: inline-block;
+      font-size: 11px; font-weight: 700; color: var(--gold);
+      letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 15px;
+      padding: 6px 15px; border-radius: 50px; border: 1px solid rgba(196,168,130,0.2);
+    }
+    h1 {
+      font-size: clamp(2.5rem, 10vw, 4.5rem);
+      font-weight: 900;
+      margin-bottom: 20px;
+      line-height: 1;
+    }
+    h1 span { color: var(--gold); }
+    p.subtitle {
+      color: rgba(255,255,255,0.5);
+      font-size: 1.1rem;
+      max-width: 650px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* FILTERS */
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 60px;
+      flex-wrap: wrap;
+      padding: 0 20px;
+    }
+    .filter-btn {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: all .3s;
+    }
+    .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-btn.active { background: var(--gold); color: var(--darker); border-color: var(--gold); }
+
+    /* GALLERY GRID */
+    .gallery {
+      max-width: 1300px;
+      margin: 0 auto 120px;
+      padding: 0 25px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 30px;
+    }
+    .gallery-item {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 1 / 1.2;
+      background: var(--dark);
+      border: 1px solid var(--glass-border);
+      transition: all .5s cubic-bezier(0.165, 0.84, 0.44, 1);
+      opacity: 0; transform: translateY(30px); /* For reveal animation */
+    }
+    .gallery-item.visible { opacity: 1; transform: translateY(0); }
+    
+    .gallery-item:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      border-color: rgba(196,168,130,0.4);
+    }
+    
+    .gallery-link { display: block; width: 100%; height: 100%; position: relative; }
+    
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    .gallery-item:hover img { transform: scale(1.15); filter: brightness(0.7); }
+
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(18,18,18,0.95) 0%, transparent 60%);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 35px 25px;
+      opacity: 0;
+      transition: opacity .4s;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+    .gallery-tag {
+      font-size: 10px; font-weight: 800; color: var(--gold);
+      text-transform: uppercase; letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .gallery-title {
+      font-size: 1.4rem; font-weight: 800; color: #fff;
+      line-height: 1.2; margin-bottom: 15px;
+    }
+    .gallery-btn {
+      font-size: 12px; font-weight: 700; color: #fff;
+      display: flex; align-items:center; gap:8px;
+      opacity: 0.8;
+    }
+    .gallery-btn svg { width: 16px; height: 16px; transition: transform .3s; }
+    .gallery-item:hover .gallery-btn svg { transform: translateX(5px); }
+
+    /* LIGHTBOX */
+    #lightbox {
+      position: fixed; inset: 0;
+      background: rgba(10,10,10,0.98);
+      z-index: 10000;
+      display: none; align-items: center; justify-content: center;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+    }
+    #lightbox.active { display: flex; animation: fadeIn .4s both; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    
+    #lightbox img {
+      max-width: 100%; max-height: 85vh;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 0 100px rgba(0,0,0,0.5);
+      border: 1px solid var(--glass-border);
+    }
+    .close-lightbox {
+      position: absolute; top: 30px; right: 30px;
+      width: 50px; height: 50px; border-radius: 50%;
+      background: var(--glass); border: 1px solid var(--glass-border);
+      color: #fff; font-size: 24px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lightbox-info {
+      position: absolute; bottom: 40px; left: 0; right: 0;
+      text-align: center;
+    }
+    .lb-title { font-size: 1.2rem; font-weight: 800; color: var(--gold); margin-bottom: 5px; }
+    .lb-cat { font-size: 0.9rem; color: rgba(255,255,255,0.5); }
+
+    /* CTA SECTION */
+    .cta-premium {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-d) 100%);
+      padding: 100px 30px;
+      text-align: center;
+      color: var(--darker);
+      border-radius: 60px 60px 0 0;
+      position: relative; overflow: hidden;
+    }
+    .cta-premium::before {
+      content: ''; position: absolute; inset: 0;
+      background: url('data:image/svg+xml,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h40v40H0z" fill="none"/><path d="M20 20L0 0m40 40L20 20m0 0l20-20M0 40l20-20" stroke="rgba(0,0,0,0.03)" stroke-width="1"/></svg>');
+      opacity: 0.5;
+    }
+    .cta-premium h2 {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 900; line-height: 1.1;
+      margin-bottom: 25px; position: relative;
+    }
+    .cta-premium p {
+      font-size: 1.2rem; font-weight: 500; opacity: 0.8;
+      margin-bottom: 45px; position: relative;
+    }
+    .btn-wa-lg {
+      display: inline-flex; align-items:center; gap:15px;
+      background: var(--darker); color: #fff;
+      padding: 22px 45px; border-radius: 100px;
+      font-size: 18px; font-weight: 800;
+      transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .btn-wa-lg:hover { transform: scale(1.08); background: #25D366; }
+
+    /* FOOTER */
+    footer {
+      padding: 60px 30px;
+      background: var(--darker);
+      text-align: center;
+      border-top: 1px solid var(--glass-border);
+    }
+    .footer-logo { font-size: 1.5rem; font-weight: 900; color: #fff; margin-bottom: 10px; }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
+
+    @media (max-width: 768px) {
+      header { padding-top: 120px; }
+      .gallery { grid-template-columns: 1fr; gap: 20px; }
+      .cta-premium { border-radius: 40px 40px 0 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox">
+    <button class="close-lightbox" aria-label="Fechar">&times;</button>
+    <img src="" alt="Ampliado">
+    <div class="lightbox-info">
+      <div class="lb-title">Título do Projeto</div>
+      <div class="lb-cat">Categoria</div>
+    </div>
+  </div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <svg width="34" height="42" viewBox="0 0 38 46" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="2,40 2,11 14,4 14,33" fill="#3D3D3D"/>
+        <polygon points="14,4 36,13 36,27 14,37" fill="#C4A882"/>
+      </svg>
+      <div class="nav-logo-text">
+        PACHECO
+        <small>GESSO E DRYWALL</small>
+      </div>
+    </a>
+    <a href="index.html" class="btn-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Início
+    </a>
+  </nav>
+
+  <header>
+    <div class="header-bg"></div>
+    <span class="badge-pt">Galeria Premium</span>
+    <h1>Obras que <span>Inspiram</span></h1>
+    <p class="subtitle">Cada detalhe é planejado para transformar seu ambiente. Veja o padrão de acabamento Joel Pacheco Machado em Curitiba e Litoral.</p>
+  </header>
+
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="residencial">Residencial</button>
+    <button class="filter-btn" data-filter="comercial">Comercial</button>
+    <button class="filter-btn" data-filter="detalhes">Sancas e Molduras</button>
+  </div>
+
+  <section class="gallery" id="gallery-grid">
+    
+    <div class="gallery-item" data-category="comercial">
+      <a href="#" class="gallery-link" onclick="openLightbox(this, 'Divisória de Drywall', 'Comercial'); return false;">
+        <img src="images/portfolio1.png" alt="Instalação de Drywall Profissional">
+        <div class="gallery-overlay">
+          <div class="gallery-tag">Comercial</div>
+          <div class="gallery-title">Divisória de Drywall Moderno</div>
+          <div class="gallery-btn">
+            Ver detalhes
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="gallery-item" data-category="residencial">
+      <a href="#" class="gallery-link" onclick="openLightbox(this, 'Teto com Sanca e LED', 'Residencial'); return false;">
+        <img src="images/portfolio2.png" alt="Forro de Gesso com Iluminação LED">
+        <div class="gallery-overlay">
+          <div class="gallery-tag">Residencial</div>
+          <div class="gallery-title">Iluminação em Sanca Invertida</div>
+          <div class="gallery-btn">
+            Ver detalhes
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="gallery-item" data-category="residencial">
+      <a href="#" class="gallery-link" onclick="openLightbox(this, 'Acabamento Premium', 'Sala de Estar'); return false;">
+        <img src="images/portfolio3.png" alt="Projeto Completo de Gesso e Drywall">
+        <div class="gallery-overlay">
+          <div class="gallery-tag">Residencial</div>
+          <div class="gallery-title">Acabamento Premium em Sala</div>
+          <div class="gallery-btn">
+            Ver detalhes
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="gallery-item" data-category="detalhes">
+      <a href="#" class="gallery-link" onclick="openLightbox(this, 'Molduras de Luxo', 'Gesso Decorativo'); return false;">
+        <img src="images/portfolio4.png" alt="Moldura de Gesso Detalhada">
+        <div class="gallery-overlay">
+          <div class="gallery-tag">Gesso Decorativo</div>
+          <div class="gallery-title">Molduras Clássicas de Alto Padrão</div>
+          <div class="gallery-btn">
+            Ver detalhes
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </div>
+      </a>
+    </div>
+
+  </section>
+
+  <section class="cta-premium">
+    <h2>Dê o padrão Pacheco<br>à sua obra.</h2>
+    <p>Orçamentos sem compromisso com atendimento agilizado no WhatsApp.</p>
+    <a href="https://wa.me/554199953289?text=Ol%C3%A1%20Joel!%20Vi%20seu%20portf%C3%B3lio%20melhorado%20e%20gostaria%20de%20um%20or%C3%A7amento." class="btn-wa-lg">
+      Solicitar Orçamento Grátis
+    </a>
+  </section>
+
+  <footer>
+    <div class="footer-logo">PACHECO</div>
+    <div class="footer-copy">© 2026 PACHECO GESSO E DRYWALL — CURITIBA/PR</div>
+  </footer>
+
+  <script>
+    // Lightbox Logic
+    const lb = document.getElementById('lightbox');
+    const lbImg = lb.querySelector('img');
+    const lbTitle = lb.querySelector('.lb-title');
+    const lbCat = lb.querySelector('.lb-cat');
+    const closeBtn = lb.querySelector('.close-lightbox');
+
+    function openLightbox(el, title, cat) {
+      const src = el.querySelector('img').src;
+      lbImg.src = src;
+      lbTitle.textContent = title;
+      lbCat.textContent = cat;
+      lb.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    closeBtn.onclick = () => {
+      lb.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    };
+
+    lb.onclick = (e) => {
+      if(e.target === lb) closeBtn.onclick();
+    };
+
+    // Filter Logic
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const items = document.querySelectorAll('.gallery-item');
+
+    filterBtns.forEach(btn => {
+      btn.onclick = () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const f = btn.dataset.filter;
+
+        items.forEach(item => {
+          if(f === 'all' || item.dataset.category === f) {
+            item.style.display = 'block';
+            setTimeout(() => item.classList.add('visible'), 10);
+          } else {
+            item.classList.remove('visible');
+            setTimeout(() => item.style.display = 'none', 500);
+          }
+        });
+      };
+    });
+
+    // Reveal Animation on Scroll
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((entry, i) => {
+        if(entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, i * 100);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    items.forEach(item => observer.observe(item));
+  </script>
+
+</body>
+</html>
