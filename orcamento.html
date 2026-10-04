@@ -6,7 +6,13 @@
   <meta name="theme-color" content="#1e1e1e">
   <meta name="robots" content="noindex, nofollow">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Orçamento">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <title>Orçamento Pacheco</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +36,7 @@
       --radius: 18px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
     html { -webkit-text-size-adjust: 100%; }
     body {
       font-family: 'Montserrat', system-ui, sans-serif;
@@ -217,6 +224,14 @@
     details.svc summary { padding: 12px 14px; font-weight: 700; cursor: pointer; font-size: .9em; }
     details.svc .body { padding: 0 14px 14px; }
 
+    .install { background: var(--dark); color: #fff; border-radius: var(--radius); padding: 16px; margin-bottom: 16px; display: flex; gap: 14px; align-items: flex-start; }
+    .install img { width: 56px; height: 56px; border-radius: 14px; flex: none; }
+    .install b { display: block; font-size: 1em; margin-bottom: 4px; }
+    .install p { font-size: .85em; color: #ddd; margin-bottom: 12px; }
+    .install p em { font-style: normal; color: var(--gold); font-weight: 700; }
+    .install .acts { display: flex; gap: 10px; flex-wrap: wrap; }
+    .install .btn { width: auto; min-height: 48px; padding: 10px 16px; font-size: .9em; }
+    .install .btn.ghost { background: transparent; color: #fff; border-color: #555; }
     .toast {
       position: fixed; left: 50%; top: 16px; transform: translate(-50%, -120px);
       background: var(--darker); color: #fff; padding: 16px 22px; border-radius: 16px;
@@ -247,6 +262,17 @@
 <main>
   <!-- ═══════════ FAZER ORÇAMENTO ═══════════ -->
   <section class="view on" id="v-novo">
+    <div class="install" id="install" hidden>
+      <img src="icons/icon-192.png" alt="">
+      <div>
+        <b>Coloque o app na tela do celular</b>
+        <p id="install-txt"></p>
+        <div class="acts">
+          <button class="btn gold" id="install-btn" hidden>Instalar agora</button>
+          <button class="btn ghost" id="install-no">Agora não</button>
+        </div>
+      </div>
+    </div>
     <div class="steps">
       <button data-go="1"><i>1</i>Cliente</button>
       <button data-go="2"><i>2</i>Medidas</button>
@@ -1357,7 +1383,40 @@ function applyFont() {
 }
 $('#font-toggle').addEventListener('click', () => { ui.big = !ui.big; saveUI(); applyFont(); });
 
+/* ════════════ App no celular (PWA) ════════════ */
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register('sw-orcamento.js', { scope: './orcamento.html' }).catch(() => {});
+}
+let installEvt = null;
+const instalado = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+function renderInstall() {
+  const box = $('#install');
+  if (instalado() || ui.installHide) { box.hidden = true; return; }
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (installEvt) {
+    $('#install-txt').textContent = 'Assim ele abre com um toque, igual aos outros aplicativos, e funciona até sem internet.';
+    $('#install-btn').hidden = false;
+  } else if (ios) {
+    $('#install-txt').innerHTML = 'No Safari, toque no botão <em>Compartilhar</em> (o quadrado com a seta para cima) e depois em <em>Adicionar à Tela de Início</em>.';
+    $('#install-btn').hidden = true;
+  } else {
+    $('#install-txt').innerHTML = 'No Chrome, toque nos <em>três pontinhos ⋮</em> lá em cima e depois em <em>Instalar app</em> ou <em>Adicionar à tela inicial</em>.';
+    $('#install-btn').hidden = true;
+  }
+  box.hidden = false;
+}
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; renderInstall(); });
+window.addEventListener('appinstalled', () => { installEvt = null; renderInstall(); toast('Pronto! O app está na tela do celular.'); });
+$('#install-btn').addEventListener('click', async () => {
+  if (!installEvt) return;
+  installEvt.prompt();
+  await installEvt.userChoice;
+  installEvt = null; renderInstall();
+});
+$('#install-no').addEventListener('click', () => { ui.installHide = true; saveUI(); renderInstall(); });
+
 q = load(KEY_DRAFT, null) || newQuote();
+renderInstall();
 applyFont();
 renderQuote();
 </script>
