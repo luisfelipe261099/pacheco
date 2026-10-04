@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1e1e1e">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Orçamento">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <title>Orçamento Pacheco</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Pensado para leitura fácil: letra grande, alto contraste, botões grandes. */
+    :root {
+      --dark: #1e1e1e;
+      --darker: #141414;
+      --gold: #C4A882;
+      --gold-d: #8a6d43;
+      --gold-light: #efe3d2;
+      --bg: #F7F5F2;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #4f4a44;
+      --line: #d9d2c8;
+      --danger: #a3352b;
+      --ok: #2e6b3c;
+      --wa: #1f8f4e;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Montserrat', system-ui, sans-serif;
+      background: var(--bg); color: var(--text);
+      font-size: 18px; line-height: 1.45; font-weight: 500;
+      padding-bottom: calc(140px + env(safe-area-inset-bottom));
+      -webkit-font-smoothing: antialiased;
+    }
+    body.big { font-size: 21px; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+    /* ── Topo ── */
+    header.top { background: var(--dark); color: #fff; padding: calc(12px + env(safe-area-inset-top)) 16px 0; }
+    .brand { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .brand b { font-size: 1em; font-weight: 800; letter-spacing: .5px; }
+    .brand b span { color: var(--gold); }
+    .fontbtn { background: #333; border: 0; color: #fff; border-radius: 12px; padding: 8px 14px; font-weight: 800; font-size: 18px; }
+    nav.tabs { display: flex; margin-top: 10px; }
+    nav.tabs button {
+      flex: 1; background: none; border: 0; color: #c9c9c9;
+      padding: 12px 4px 14px; font-size: .85em; font-weight: 700; line-height: 1.2;
+      border-bottom: 4px solid transparent;
+    }
+    nav.tabs button.on { color: #fff; border-color: var(--gold); }
+
+    main { max-width: 680px; margin: 0 auto; padding: 16px; }
+    .view, .step { display: none; }
+    .view.on, .step.on { display: block; }
+
+    /* ── Passos ── */
+    .steps { display: flex; gap: 6px; margin-bottom: 16px; }
+    .steps button {
+      flex: 1; border: 2px solid var(--line); background: #fff; border-radius: 14px;
+      padding: 8px 4px; font-size: .78em; font-weight: 700; color: var(--muted); line-height: 1.2;
+    }
+    .steps button i { display: block; font-style: normal; font-size: 1.35em; font-weight: 800; }
+    .steps button.on { border-color: var(--dark); background: var(--dark); color: #fff; }
+    .steps button.done { border-color: var(--gold); color: var(--gold-d); }
+    h1 { font-size: 1.4em; font-weight: 800; margin: 2px 0 4px; }
+    .lead { color: var(--muted); margin-bottom: 16px; }
+
+    /* ── Cartões e campos ── */
+    .card { background: var(--card); border-radius: var(--radius); border: 2px solid var(--line); padding: 18px; margin-bottom: 16px; }
+    .card h2 { font-size: 1.1em; font-weight: 800; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    label.f { display: block; font-size: .9em; font-weight: 700; margin-bottom: 14px; }
+    label.f:last-child { margin-bottom: 0; }
+    label.f input, label.f select, label.f textarea {
+      display: block; width: 100%; margin-top: 6px;
+      padding: 14px; border: 2px solid var(--line); border-radius: 14px;
+      background: #fff; font-size: 20px; font-weight: 600; color: var(--text);
+    }
+    label.f textarea { min-height: 90px; resize: vertical; font-size: 18px; font-weight: 500; }
+    input:focus, select:focus, textarea:focus { outline: 3px solid var(--gold); border-color: var(--gold-d) !important; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .two label.f { margin-bottom: 0; }
+    .hint { font-size: .85em; color: var(--muted); }
+
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      border: 0; border-radius: 16px; padding: 16px 18px; min-height: 58px;
+      font-weight: 800; font-size: 1em; background: var(--dark); color: #fff; width: 100%;
+      text-align: center; line-height: 1.2;
+    }
+    .btn.gold { background: var(--gold); color: var(--darker); }
+    .btn.wa { background: var(--wa); color: #fff; }
+    .btn.ghost { background: #fff; color: var(--text); border: 2px solid var(--line); }
+    .btn.danger { background: #fff; color: var(--danger); border: 2px solid #e3bdb8; }
+    .btn.sm { min-height: 46px; padding: 10px 14px; font-size: .85em; border-radius: 12px; width: auto; }
+    .btn svg { width: 24px; height: 24px; flex: none; }
+    .stack > * + * { margin-top: 12px; }
+    .link { background: none; border: 0; color: var(--gold-d); font-weight: 800; text-decoration: underline; padding: 6px 0; font-size: .9em; }
+    .link.red { color: var(--danger); }
+
+    /* ── Cômodo ── */
+    .room-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .room-title .n { font-size: 1.2em; font-weight: 800; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .chips button { border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: .85em; }
+    .chips button.on { background: var(--dark); border-color: var(--dark); color: #fff; }
+    .measure { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .measure label.f { margin: 0; }
+    .measure input { text-align: center; font-size: 26px !important; font-weight: 800 !important; }
+    .area-box { display: flex; align-items: center; gap: 14px; margin: 14px 0 4px; }
+    .area-box .plan { width: 120px; flex: none; }
+    .area-box .nums { font-size: .95em; }
+    .area-box .nums b { font-size: 1.15em; }
+    .plan { background: #fbf9f6; border: 2px dashed var(--line); border-radius: 12px; display: block; }
+
+    .q { font-weight: 800; margin: 18px 0 10px; font-size: 1em; }
+    .svc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .svc-btn {
+      border: 2px solid var(--line); background: #fff; border-radius: 14px;
+      padding: 12px 10px; min-height: 64px; font-weight: 700; font-size: .85em; line-height: 1.2;
+      text-align: left; display: flex; align-items: center; gap: 8px;
+    }
+    .svc-btn .ck { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--line); flex: none; display: grid; place-items: center; font-size: 17px; font-weight: 900; color: transparent; }
+    .svc-btn.on { border-color: var(--gold-d); background: var(--gold-light); }
+    .svc-btn.on .ck { background: var(--gold-d); border-color: var(--gold-d); color: #fff; }
+
+    .item { border: 2px solid var(--gold); border-radius: 14px; padding: 14px; margin-top: 12px; background: #fffdf9; }
+    .item-h { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+    .item-h b { font-size: .95em; }
+    .item-h .v { font-weight: 800; white-space: nowrap; }
+    .item .calc { color: var(--muted); font-size: .9em; margin-top: 4px; }
+    .item .more { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+    .item .row { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .item .row .link { padding: 10px 0; }
+
+    .stepper { display: flex; align-items: center; gap: 0; border: 2px solid var(--line); border-radius: 14px; overflow: hidden; background: #fff; }
+    .stepper button { width: 54px; height: 54px; border: 0; background: #f1ece4; font-size: 28px; font-weight: 800; }
+    .stepper input { width: 70px; height: 54px; border: 0; text-align: center; font-size: 22px; font-weight: 800; background: #fff; }
+    .stp-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+    .stp-line span { font-weight: 700; font-size: .9em; }
+    .num-line { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .num-line span { font-weight: 700; font-size: .9em; flex: 1; }
+    .num-line input { width: 120px; padding: 12px; border: 2px solid var(--line); border-radius: 14px; font-size: 22px; font-weight: 800; text-align: center; }
+
+    /* ── Conferir ── */
+    .sum-line { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #eee7dd; }
+    .sum-line:last-child { border-bottom: 0; }
+    .sum-line.sub { color: var(--muted); font-size: .88em; padding: 2px 0 2px 12px; border: 0; }
+    .big-total { background: var(--dark); color: #fff; border-radius: var(--radius); padding: 18px; margin-bottom: 16px; text-align: center; }
+    .big-total span { display: block; color: #ccc; font-size: .85em; font-weight: 700; }
+    .big-total b { display: block; color: var(--gold); font-size: 2em; font-weight: 800; line-height: 1.2; }
+    .big-total small { display: block; color: #ddd; font-size: .8em; margin-top: 4px; }
+    details.box { background: #fff; border: 2px solid var(--line); border-radius: var(--radius); margin-bottom: 16px; }
+    details.box > summary { padding: 16px 18px; font-weight: 800; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    details.box > summary::-webkit-details-marker { display: none; }
+    details.box > summary::after { content: '+'; font-size: 1.5em; line-height: 1; color: var(--gold-d); }
+    details.box[open] > summary::after { content: '−'; }
+    details.box > .in { padding: 0 18px 18px; }
+    table.mat { width: 100%; border-collapse: collapse; font-size: .9em; }
+    table.mat td { padding: 8px 4px; border-bottom: 1px solid #eee7dd; }
+    table.mat td:last-child { text-align: right; font-weight: 800; white-space: nowrap; }
+    .check { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: .9em; margin-top: 14px; }
+    .check input { width: 28px; height: 28px; accent-color: var(--gold-d); flex: none; }
+
+    /* ── Barra de baixo ── */
+    .bar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+      background: var(--dark); color: #fff;
+      padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+      box-shadow: 0 -6px 20px rgba(0,0,0,.2);
+    }
+    .bar .in { max-width: 680px; margin: 0 auto; }
+    .bar .tot { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .bar .tot span { color: #ccc; font-size: .8em; font-weight: 700; }
+    .bar .tot b { color: var(--gold); font-size: 1.4em; font-weight: 800; }
+    .bar .row { display: flex; gap: 10px; }
+    .bar .btn { white-space: nowrap; }
+    .bar .btn.ghost { background: transparent; color: #fff; border-color: #555; flex: 0 0 34%; }
+    body.no-bar .bar { display: none; }
+    body.no-bar { padding-bottom: 40px; }
+
+    /* ── Meus orçamentos ── */
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .stat { background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 12px; }
+    .stat span { display: block; font-size: .78em; font-weight: 700; color: var(--muted); }
+    .stat b { display: block; font-size: 1.15em; }
+    .search { width: 100%; padding: 14px 16px; border-radius: 14px; border: 2px solid var(--line); margin-bottom: 14px; font-size: 18px; background: #fff; }
+    .hist { background: #fff; border: 2px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+    .hist .t { display: flex; justify-content: space-between; gap: 10px; }
+    .hist .t b { font-size: 1.05em; }
+    .hist .t .v { font-weight: 800; white-space: nowrap; }
+    .hist .m { color: var(--muted); font-size: .85em; margin: 2px 0 12px; }
+    .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+    .seg button { border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 10px 4px; font-weight: 700; font-size: .78em; line-height: 1.2; }
+    .seg button.on[data-v="pendente"] { background: #fff4d6; border-color: #d9b44a; }
+    .seg button.on[data-v="aprovado"] { background: #dff0e3; border-color: var(--ok); color: var(--ok); }
+    .seg button.on[data-v="recusado"] { background: #f6e0dd; border-color: var(--danger); color: var(--danger); }
+    .hist .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+
+    /* ── Preços ── */
+    .price-row { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #eee7dd; }
+    .price-row:last-child { border-bottom: 0; }
+    .price-row .nm { flex: 1; font-weight: 700; font-size: .9em; line-height: 1.25; }
+    .price-row .nm small { display: block; color: var(--muted); font-weight: 500; font-size: .85em; margin-top: 2px; }
+    .price-row input { width: 96px; padding: 12px 8px; border: 2px solid var(--line); border-radius: 12px; font-size: 20px; font-weight: 800; text-align: center; }
+    .price-row .pr { display: grid; grid-template-columns: auto 96px; align-items: center; gap: 2px 6px; }
+    .price-row .un { grid-column: 2; text-align: center; font-size: .75em; color: var(--muted); font-weight: 700; }
+    .price-row.off { opacity: .45; }
+    details.svc { border: 2px solid var(--line); border-radius: 14px; margin-bottom: 10px; }
+    details.svc summary { padding: 12px 14px; font-weight: 700; cursor: pointer; font-size: .9em; }
+    details.svc .body { padding: 0 14px 14px; }
+
+    .install { background: var(--dark); color: #fff; border-radius: var(--radius); padding: 16px; margin-bottom: 16px; display: flex; gap: 14px; align-items: flex-start; }
+    .install img { width: 56px; height: 56px; border-radius: 14px; flex: none; }
+    .install b { display: block; font-size: 1em; margin-bottom: 4px; }
+    .install p { font-size: .85em; color: #ddd; margin-bottom: 12px; }
+    .install p em { font-style: normal; color: var(--gold); font-weight: 700; }
+    .install .acts { display: flex; gap: 10px; flex-wrap: wrap; }
+    .install .btn { width: auto; min-height: 48px; padding: 10px 16px; font-size: .9em; }
+    .install .btn.ghost { background: transparent; color: #fff; border-color: #555; }
+    .toast {
+      position: fixed; left: 50%; top: 16px; transform: translate(-50%, -120px);
+      background: var(--darker); color: #fff; padding: 16px 22px; border-radius: 16px;
+      font-size: 18px; font-weight: 700; z-index: 99; transition: transform .25s;
+      box-shadow: 0 8px 24px rgba(0,0,0,.3); width: max-content; max-width: calc(100% - 32px); text-align: center;
+    }
+    .toast.on { transform: translate(-50%, env(safe-area-inset-top)); }
+
+    @media (max-width: 380px) {
+      .svc-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <b>Pacheco <span>Orçamentos</span></b>
+    <button class="fontbtn" id="font-toggle" aria-label="Aumentar ou diminuir a letra">A+</button>
+  </div>
+  <nav class="tabs">
+    <button data-tab="novo" class="on">Fazer orçamento</button>
+    <button data-tab="historico">Meus orçamentos</button>
+    <button data-tab="config">Meus preços</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ═══════════ FAZER ORÇAMENTO ═══════════ -->
+  <section class="view on" id="v-novo">
+    <div class="install" id="install" hidden>
+      <img src="icons/icon-192.png" alt="">
+      <div>
+        <b>Coloque o app na tela do celular</b>
+        <p id="install-txt"></p>
+        <div class="acts">
+          <button class="btn gold" id="install-btn" hidden>Instalar agora</button>
+          <button class="btn ghost" id="install-no">Agora não</button>
+        </div>
+      </div>
+    </div>
+    <div class="steps">
+      <button data-go="1"><i>1</i>Cliente</button>
+      <button data-go="2"><i>2</i>Medidas</button>
+      <button data-go="3"><i>3</i>Enviar</button>
+    </div>
+
+    <!-- Passo 1 -->
+    <div class="step" data-step="1">
+      <h1>Quem é o cliente?</h1>
+      <p class="lead">Só o nome já basta. O resto é opcional.</p>
+      <div class="card">
+        <label class="f">Nome do cliente<input id="c-nome" autocomplete="off" placeholder="Ex.: Maria Souza"></label>
+        <label class="f">WhatsApp do cliente<input id="c-tel" type="tel" inputmode="tel" placeholder="(41) 9 9999-9999"></label>
+        <label class="f">Endereço da obra<input id="c-end" placeholder="Rua, número, bairro"></label>
+      </div>
+      <p class="hint" id="q-numero"></p>
+    </div>
+
+    <!-- Passo 2 -->
+    <div class="step" data-step="2">
+      <h1>Medidas e serviços</h1>
+      <p class="lead">Para cada cômodo: digite as medidas e toque no que vai fazer. As contas são automáticas.</p>
+      <div id="rooms"></div>
+      <button class="btn gold" id="add-room">+ Adicionar outro cômodo</button>
+    </div>
+
+    <!-- Passo 3 -->
+    <div class="step" data-step="3">
+      <h1>Conferir e enviar</h1>
+      <p class="lead" id="s3-lead"></p>
+      <div class="big-total" id="big-total"></div>
+      <div class="card" id="summary"></div>
+      <div class="stack" style="margin-bottom:16px">
+        <button class="btn wa" id="act-share">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1.1 2.7.1.2 1.9 2.9 4.6 4 1.7.7 2.4.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+          Enviar pelo WhatsApp
+        </button>
+        <button class="btn" id="act-pdf">Baixar o PDF</button>
+      </div>
+      <details class="box">
+        <summary>Dar desconto ou cobrar deslocamento</summary>
+        <div class="in">
+          <div class="two">
+            <label class="f">Desconto (%)<input id="q-desc" inputmode="decimal" placeholder="0"></label>
+            <label class="f">Deslocamento (R$)<input id="q-desloc" inputmode="decimal"></label>
+          </div>
+        </div>
+      </details>
+      <details class="box">
+        <summary>Escrever um recado no PDF</summary>
+        <div class="in">
+          <label class="f">Recado para o cliente<textarea id="q-obs" placeholder="Ex.: o cliente compra as luminárias."></textarea></label>
+        </div>
+      </details>
+      <details class="box">
+        <summary>Ver lista de materiais</summary>
+        <div class="in">
+          <div id="materials"></div>
+          <label class="check"><input type="checkbox" id="q-mostrarmat"> Colocar a lista de materiais no PDF</label>
+        </div>
+      </details>
+      <button class="btn ghost" id="new-quote">Começar um orçamento novo</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ MEUS ORÇAMENTOS ═══════════ -->
+  <section class="view" id="v-historico">
+    <h1>Meus orçamentos</h1>
+    <p class="lead">Toque em <b>Fechou</b> quando o cliente aprovar.</p>
+    <div class="stats" id="stats"></div>
+    <input class="search" id="h-busca" placeholder="Procurar cliente…">
+    <div id="hist-list"></div>
+    <button class="btn gold" id="h-novo" style="margin-top:8px">+ Fazer orçamento novo</button>
+  </section>
+
+  <!-- ═══════════ MEUS PREÇOS ═══════════ -->
+  <section class="view" id="v-config">
+    <h1>Meus preços</h1>
+    <p class="lead">Mude o valor e pronto, já fica salvo. Os preços já incluem material e mão de obra.</p>
+    <div class="card" id="price-list"></div>
+    <button class="btn ghost" id="svc-reajuste" style="margin-bottom:16px">Aumentar todos os preços (%)</button>
+
+    <details class="box">
+      <summary>Forma de pagamento e garantia</summary>
+      <div class="in">
+        <label class="f">Forma de pagamento<textarea data-cfg="orcamento.pagamento"></textarea></label>
+        <label class="f">Garantia e o que está incluso<textarea data-cfg="orcamento.condicoes"></textarea></label>
+        <label class="f">Chave PIX<input data-cfg="empresa.pix"></label>
+      </div>
+    </details>
+    <details class="box">
+      <summary>Valor mínimo e deslocamento</summary>
+      <div class="in">
+        <div class="two" style="margin-bottom:14px">
+          <label class="f">Valor mínimo (R$)<input data-cfg="orcamento.valorMinimo" inputmode="decimal"></label>
+          <label class="f">Deslocamento (R$)<input data-cfg="orcamento.deslocamento" inputmode="decimal"></label>
+        </div>
+        <div class="two">
+          <label class="f">Validade (dias)<input data-cfg="orcamento.validadeDias" inputmode="numeric"></label>
+          <label class="f">Altura do teto (m)<input data-cfg="orcamento.peDireito" inputmode="decimal"></label>
+        </div>
+        <p class="hint" style="margin-top:10px">Valor mínimo: se o orçamento der menos que isso, o total sobe para esse valor.</p>
+      </div>
+    </details>
+    <details class="box">
+      <summary>Meus dados no PDF</summary>
+      <div class="in">
+        <label class="f">Nome da empresa<input data-cfg="empresa.nome"></label>
+        <label class="f">Seu nome<input data-cfg="empresa.responsavel"></label>
+        <label class="f">Telefone<input data-cfg="empresa.telefone" type="tel"></label>
+        <label class="f">CNPJ ou CPF<input data-cfg="empresa.documento"></label>
+        <label class="f">E-mail<input data-cfg="empresa.email" type="email"></label>
+        <label class="f">Site<input data-cfg="empresa.site"></label>
+        <label class="f">Cidade<input data-cfg="empresa.endereco"></label>
+      </div>
+    </details>
+    <details class="box">
+      <summary>Guardar uma cópia de tudo</summary>
+      <div class="in stack">
+        <p class="hint">Tudo fica guardado neste celular. Uma vez por mês, baixe uma cópia e mande para você mesmo no WhatsApp. Se trocar de celular, é só abrir a cópia aqui.</p>
+        <button class="btn" id="bk-export">Baixar cópia</button>
+        <label class="btn ghost">Abrir uma cópia<input type="file" id="bk-import" accept="application/json,.json" hidden></label>
+      </div>
+    </details>
+    <details class="box">
+      <summary>Avançado (serviços e materiais)</summary>
+      <div class="in">
+        <p class="hint" style="margin-bottom:12px">Aqui dá para criar serviços novos e mudar como cada um é calculado. Não precisa mexer no dia a dia.</p>
+        <div id="svc-list"></div>
+        <div class="stack" style="margin-top:12px">
+          <button class="btn ghost" id="svc-add">+ Criar serviço novo</button>
+          <label class="f" style="margin:0">Perda de material (%)<input data-cfg="orcamento.perda" inputmode="decimal"></label>
+          <label class="f" style="margin:0">Número do próximo orçamento<input data-cfg="orcamento.proximoNumero" inputmode="numeric"></label>
+          <button class="btn danger" id="cfg-reset">Voltar todos os preços ao padrão</button>
+        </div>
+      </div>
+    </details>
+  </section>
+</main>
+
+<div class="bar" id="bar">
+  <div class="in">
+    <div class="tot"><span id="bar-info">Total</span><b id="bar-total">R$ 0,00</b></div>
+    <div class="row">
+      <button class="btn ghost" id="bar-back">‹ Voltar</button>
+      <button class="btn gold" id="bar-next">Próximo ›</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/jspdf.umd.min.js"></script>
+<script src="js/jspdf.plugin.autotable.min.js"></script>
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════
+   PREÇOS PADRÃO
+   Referência de mercado 2026, material + mão de obra.
+   Joel ajusta tudo em "Meus preços".
+   base: area = largura × comprimento
+         perimetro = 2 × (largura + comprimento)
+         parede = comprimento da parede × altura − portas e janelas
+         manual = Joel digita a quantidade
+   materiais: quantidade por unidade do serviço (sem a perda)
+   ════════════════════════════════════════════════════════════ */
+const DEFAULT_SERVICOS = [
+  { id: 'forro_gesso', nome: 'Forro de gesso (placa 60×60)', unidade: 'm²', base: 'area', preco: 75, produtividade: 25, tipo: 'forro',
+    ref: 'Mercado 2026: R$ 60 a R$ 85/m² instalado.',
+    materiais: [['Placa de gesso 60×60', 'un', 2.78], ['Gesso em pó (cola)', 'kg', 1], ['Arame galvanizado nº 18', 'kg', 0.05], ['Sisal', 'kg', 0.05]] },
+  { id: 'forro_drywall', nome: 'Forro de drywall (gesso acartonado)', unidade: 'm²', base: 'area', preco: 120, produtividade: 20, tipo: 'forro',
+    ref: 'Mercado 2026: R$ 90 a R$ 150/m² com estrutura, placas e tratamento de juntas.',
+    materiais: [['Placa drywall ST 1,20×1,80', 'un', 0.46], ['Perfil F530 (barra 3 m)', 'barra', 0.75], ['Regulador / pendural', 'un', 1.2], ['Parafuso 3,5×25', 'un', 15], ['Massa para junta', 'kg', 0.5], ['Fita de papel', 'm', 1.5]] },
+  { id: 'forro_drywall_ru', nome: 'Forro drywall resistente à umidade (RU)', unidade: 'm²', base: 'area', preco: 145, produtividade: 18, tipo: 'forro',
+    ref: 'Banheiro, cozinha e área de serviço. Placa verde costuma custar 20% a 30% mais.',
+    materiais: [['Placa drywall RU 1,20×1,80', 'un', 0.46], ['Perfil F530 (barra 3 m)', 'barra', 0.75], ['Regulador / pendural', 'un', 1.2], ['Parafuso 3,5×25', 'un', 15], ['Massa para junta', 'kg', 0.5], ['Fita de papel', 'm', 1.5]] },
+  { id: 'parede_drywall', nome: 'Parede / divisória de drywall', unidade: 'm²', base: 'parede', preco: 150, produtividade: 15, tipo: 'parede',
+    ref: 'Mercado 2026: R$ 120 a R$ 220/m² (2 faces, estrutura 48 mm, massa e lixa).',
+    materiais: [['Placa drywall ST 1,20×1,80', 'un', 0.93], ['Montante 48 mm (barra 3 m)', 'barra', 0.65], ['Guia 48 mm (barra 3 m)', 'barra', 0.25], ['Parafuso 3,5×25', 'un', 30], ['Massa para junta', 'kg', 1], ['Fita de papel', 'm', 3]] },
+  { id: 'parede_acustica', nome: 'Parede drywall com isolamento acústico', unidade: 'm²', base: 'parede', preco: 210, produtividade: 12, tipo: 'parede',
+    ref: 'Mercado 2026: R$ 180 a R$ 240/m² com lã de vidro ou de rocha.',
+    materiais: [['Placa drywall ST 1,20×1,80', 'un', 0.93], ['Montante 48 mm (barra 3 m)', 'barra', 0.65], ['Guia 48 mm (barra 3 m)', 'barra', 0.25], ['Lã de vidro / rocha', 'm²', 1], ['Parafuso 3,5×25', 'un', 30], ['Massa para junta', 'kg', 1], ['Fita de papel', 'm', 3]] },
+  { id: 'sanca_aberta', nome: 'Sanca aberta (luz indireta)', unidade: 'm', base: 'perimetro', preco: 95, produtividade: 10, tipo: 'sanca',
+    ref: 'Mercado 2026: R$ 70 a R$ 140 por metro linear.',
+    materiais: [['Placa drywall ST 1,20×1,80', 'un', 0.3], ['Perfil F530 (barra 3 m)', 'barra', 0.6], ['Parafuso 3,5×25', 'un', 20], ['Massa para junta', 'kg', 0.4]] },
+  { id: 'sanca_fechada', nome: 'Sanca fechada', unidade: 'm', base: 'perimetro', preco: 70, produtividade: 12, tipo: 'sanca',
+    ref: 'Mercado 2026: R$ 55 a R$ 100 por metro linear.',
+    materiais: [['Placa drywall ST 1,20×1,80', 'un', 0.25], ['Perfil F530 (barra 3 m)', 'barra', 0.5], ['Parafuso 3,5×25', 'un', 15], ['Massa para junta', 'kg', 0.3]] },
+  { id: 'moldura', nome: 'Moldura de gesso', unidade: 'm', base: 'perimetro', preco: 35, produtividade: 25, tipo: 'moldura',
+    ref: 'Mercado 2026: R$ 25 a R$ 55 por metro linear, conforme o modelo.',
+    materiais: [['Moldura de gesso (barra 1 m)', 'un', 1.05], ['Gesso em pó (cola)', 'kg', 0.3]] },
+  { id: 'rasgo_luz', nome: 'Rasgo de luz / tabica', unidade: 'm', base: 'manual', preco: 110, produtividade: 10, tipo: 'linha',
+    ref: 'Mercado 2026: R$ 95 a R$ 140 por metro linear.',
+    materiais: [['Perfil tabica', 'm', 1.05], ['Parafuso 3,5×25', 'un', 10]] },
+  { id: 'cortineiro', nome: 'Cortineiro de gesso', unidade: 'm', base: 'manual', preco: 80, produtividade: 10, tipo: 'linha',
+    ref: 'Mercado 2026: R$ 60 a R$ 120 por metro linear.',
+    materiais: [['Placa drywall ST 1,20×1,80', 'un', 0.25], ['Perfil F530 (barra 3 m)', 'barra', 0.4], ['Parafuso 3,5×25', 'un', 12]] },
+  { id: 'spot', nome: 'Recorte para spot / luminária', unidade: 'un', base: 'manual', preco: 20, produtividade: 40, tipo: 'spot',
+    ref: 'Mercado 2026: R$ 15 a R$ 35 por furo (sem instalação elétrica).',
+    materiais: [] },
+  { id: 'nicho', nome: 'Nicho de drywall', unidade: 'un', base: 'manual', preco: 280, produtividade: 2, tipo: 'outro',
+    ref: 'Mercado 2026: R$ 200 a R$ 450 por nicho, conforme tamanho.',
+    materiais: [['Placa drywall ST 1,20×1,80', 'un', 0.5], ['Montante 48 mm (barra 3 m)', 'barra', 0.5], ['Parafuso 3,5×25', 'un', 25], ['Massa para junta', 'kg', 0.5]] },
+  { id: 'reparo', nome: 'Reparo de gesso (trinca, infiltração, buraco)', unidade: 'm²', base: 'manual', preco: 95, produtividade: 10, tipo: 'outro',
+    ref: 'Reparo costuma ter valor mínimo de visita de R$ 250 a R$ 400.',
+    materiais: [['Gesso em pó', 'kg', 2], ['Massa para junta', 'kg', 0.5]] },
+  { id: 'pintura', nome: 'Pintura do forro (massa + 2 demãos)', unidade: 'm²', base: 'area', preco: 28, produtividade: 30, tipo: 'outro',
+    ref: 'Mercado 2026: R$ 20 a R$ 40/m².',
+    materiais: [['Massa corrida', 'kg', 0.5], ['Tinta acrílica branca', 'L', 0.3]] },
+];
+
+// Nomes curtos para os botões grandes do passo 2.
+const CURTOS = {
+  forro_gesso: 'Forro de gesso', forro_drywall: 'Forro de drywall', forro_drywall_ru: 'Forro p/ banheiro (RU)',
+  parede_drywall: 'Parede de drywall', parede_acustica: 'Parede com isolamento', sanca_aberta: 'Sanca aberta',
+  sanca_fechada: 'Sanca fechada', moldura: 'Moldura', rasgo_luz: 'Rasgo de luz', cortineiro: 'Cortineiro',
+  spot: 'Furos p/ spot', nicho: 'Nicho', reparo: 'Reparo', pintura: 'Pintura do forro',
+};
+const curto = (s) => s.curto || CURTOS[s.id] || s.nome;
+
+const PORTA_M2 = 1.68;  // 0,80 × 2,10
+const JANELA_M2 = 1.44; // 1,20 × 1,20
+
+const DEFAULT_CONFIG = {
+  empresa: {
+    nome: 'Pacheco Gesso e Drywall',
+    responsavel: 'Joel Pacheco Machado',
+    telefone: '(41) 9995-3289',
+    documento: '',
+    email: '',
+    site: 'www.pachegessodrywall.com.br',
+    endereco: 'Curitiba e Região Metropolitana - PR',
+    pix: '',
+  },
+  orcamento: {
+    valorMinimo: 450,
+    deslocamento: 0,
+    perda: 10,
+    validadeDias: 15,
+    peDireito: 2.7,
+    proximoNumero: 1,
+    pagamento: '50% na aprovação e 50% na entrega do serviço. PIX, transferência ou cartão (taxa da maquininha por conta do cliente).',
+    condicoes: 'Valores com material e mão de obra inclusos. Limpeza grossa ao final do serviço. Garantia de 1 ano contra defeitos de execução. Instalação elétrica e luminárias não inclusas, salvo quando descritas.',
+  },
+  servicos: DEFAULT_SERVICOS,
+};
+
+/* ════════════ Estado e armazenamento ════════════ */
+const KEY_CFG = 'pacheco.config.v1';
+const KEY_HIST = 'pacheco.historico.v1';
+const KEY_DRAFT = 'pacheco.rascunho.v1';
+const KEY_UI = 'pacheco.ui.v1';
+
+const clone = (o) => JSON.parse(JSON.stringify(o));
+function load(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
+}
+function store(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch (e) { toast('Não consegui guardar neste celular.'); return false; }
+}
+function mergeCfg(saved) {
+  const base = clone(DEFAULT_CONFIG);
+  if (!saved) return base;
+  return {
+    empresa: Object.assign(base.empresa, saved.empresa || {}),
+    orcamento: Object.assign(base.orcamento, saved.orcamento || {}),
+    servicos: Array.isArray(saved.servicos) && saved.servicos.length ? saved.servicos : base.servicos,
+  };
+}
+
+const uid = () => Math.random().toString(36).slice(2, 9);
+const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+
+let cfg = mergeCfg(load(KEY_CFG, null));
+let hist = load(KEY_HIST, []);
+let ui = Object.assign({ step: 1, big: false }, load(KEY_UI, {}));
+let q;
+const openMore = new Set(); // itens com "Mudar" aberto (só na tela)
+
+const saveCfg = () => store(KEY_CFG, cfg);
+const saveDraft = () => store(KEY_DRAFT, q);
+const saveUI = () => store(KEY_UI, ui);
+
+function newQuote() {
+  return {
+    id: uid(), numero: null, status: 'pendente', criadoEm: Date.now(),
+    cliente: { nome: '', tel: '', end: '', data: today() },
+    ambientes: [newRoom('Sala')],
+    deslocamento: null, desconto: 0, obs: '', mostrarMateriais: false,
+  };
+}
+function newRoom(nome) {
+  return { id: uid(), nome: nome || 'Cômodo', largura: '', comprimento: '', peDireito: cfg.orcamento.peDireito, itens: [] };
+}
+
+/* ════════════ Utilidades ════════════ */
+const num = (v) => { if (typeof v === 'number') return isFinite(v) ? v : 0; const n = parseFloat(String(v || '').replace(/\s/g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
+const r2 = (n) => Math.round(n * 100) / 100;
+const brl = (n) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const fmt = (n, d = 2) => n.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: d });
+const dec = (v) => (v == null ? '' : String(v).replace('.', ','));
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const svcById = (id) => cfg.servicos.find((s) => s.id === id);
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const dataBR = (iso) => { if (!iso) return ''; const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}`; };
+const numeroFmt = (n, ano) => `${ano}-${String(n).padStart(4, '0')}`;
+const plural = (n, um, varios) => `${fmt(n)} ${n === 1 ? um : varios}`;
+const UN_TXT = { 'm²': 'metros quadrados', m: 'metros', un: 'unidades' };
+
+let toastT;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3200);
+}
+
+/* ════════════ Cálculos ════════════ */
+function roomGeo(r) {
+  const L = num(r.largura), C = num(r.comprimento);
+  return { L, C, area: r2(L * C), perim: r2(2 * (L + C)), pe: num(r.peDireito) || cfg.orcamento.peDireito };
+}
+function aberturas(item) {
+  return num(item.aberturas) + num(item.portas) * PORTA_M2 + num(item.janelas) * JANELA_M2;
+}
+function autoQty(item, r) {
+  const s = svcById(item.servicoId); if (!s) return 0;
+  const g = roomGeo(r);
+  if (s.base === 'area') return g.area;
+  if (s.base === 'perimetro') return g.perim;
+  if (s.base === 'parede') {
+    const comp = item.paredeComp === '' || item.paredeComp == null ? g.L : num(item.paredeComp);
+    return r2(Math.max(0, comp * g.pe - aberturas(item)));
+  }
+  return 0;
+}
+function itemQty(item, r) {
+  const s = svcById(item.servicoId);
+  return item.manual || !s || s.base === 'manual' ? num(item.qtd) : autoQty(item, r);
+}
+function itemPrice(item) {
+  if (item.preco != null && item.preco !== '') return num(item.preco);
+  const s = svcById(item.servicoId); return s ? num(s.preco) : 0;
+}
+
+function calc(quote) {
+  let dias = 0;
+  const mats = {};
+  const perda = 1 + num(cfg.orcamento.perda) / 100;
+  const ambientes = quote.ambientes.map((r) => {
+    let tot = 0;
+    const itens = r.itens.map((it) => {
+      const s = svcById(it.servicoId);
+      const qtd = itemQty(it, r), preco = itemPrice(it), sub = r2(qtd * preco);
+      tot += sub;
+      if (s) {
+        if (num(s.produtividade) > 0) dias += qtd / num(s.produtividade);
+        (s.materiais || []).forEach(([nome, un, coef]) => {
+          const k = nome + '|' + un;
+          mats[k] = mats[k] || { nome, un, qtd: 0 };
+          mats[k].qtd += qtd * num(coef) * perda;
+        });
+      }
+      return { it, s, qtd, preco, sub, nome: s ? s.nome : 'Serviço removido', unidade: s ? s.unidade : '' };
+    });
+    return { r, g: roomGeo(r), itens, total: r2(tot) };
+  });
+  const subtotal = r2(ambientes.reduce((a, x) => a + x.total, 0));
+  const desloc = quote.deslocamento == null || quote.deslocamento === '' ? num(cfg.orcamento.deslocamento) : num(quote.deslocamento);
+  const descPct = Math.min(100, Math.max(0, num(quote.desconto)));
+  const desconto = r2(subtotal * descPct / 100);
+  let total = r2(subtotal - desconto + desloc);
+  const minimo = num(cfg.orcamento.valorMinimo);
+  let ajusteMinimo = 0;
+  if (subtotal > 0 && total < minimo) { ajusteMinimo = r2(minimo - total); total = minimo; }
+  const materiais = Object.values(mats).filter((m) => m.qtd > 0).map((m) => ({ ...m, qtd: Math.ceil(m.qtd) })).sort((a, b) => a.nome.localeCompare(b.nome));
+  return { ambientes, subtotal, desloc, descPct, desconto, ajusteMinimo, total, dias: dias > 0 ? Math.max(1, Math.ceil(dias)) : 0, materiais };
+}
+
+/* ════════════ Projeção (planta) ════════════ */
+function planShapes(r) {
+  const g = roomGeo(r);
+  const tipos = new Set(r.itens.map((it) => (svcById(it.servicoId) || {}).tipo));
+  const spots = r.itens.filter((it) => (svcById(it.servicoId) || {}).tipo === 'spot').reduce((a, it) => a + Math.round(itemQty(it, r)), 0);
+  const paredes = r.itens.filter((it) => (svcById(it.servicoId) || {}).tipo === 'parede').map((it) => (it.paredeComp === '' || it.paredeComp == null ? g.L : num(it.paredeComp)));
+  return { g, forro: tipos.has('forro'), sanca: tipos.has('sanca'), moldura: tipos.has('moldura'), linha: tipos.has('linha'), spots: Math.min(spots, 40), paredes };
+}
+
+function planSVG(r) {
+  const p = planShapes(r), W = 150, H = 150, pad = 22;
+  if (!p.g.L || !p.g.C) {
+    return `<svg class="plan" viewBox="0 0 ${W} ${H}" role="img" aria-label="Desenho do cômodo"><text x="${W / 2}" y="${H / 2 - 6}" text-anchor="middle" font-size="13" font-weight="700" fill="#77716a">Digite as</text><text x="${W / 2}" y="${H / 2 + 12}" text-anchor="middle" font-size="13" font-weight="700" fill="#77716a">medidas</text></svg>`;
+  }
+  const sc = Math.min((W - pad * 2) / p.g.L, (H - pad * 2) / p.g.C);
+  const w = p.g.L * sc, h = p.g.C * sc, x = (W - w) / 2, y = (H - h) / 2;
+  let s = `<svg class="plan" viewBox="0 0 ${W} ${H}" role="img" aria-label="Desenho do cômodo ${esc(r.nome)}">`;
+  s += `<defs><pattern id="hx${r.id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#e5d4be" stroke-width="2"/></pattern></defs>`;
+  s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${p.forro ? `url(#hx${r.id})` : '#fff'}" stroke="#1e1e1e" stroke-width="2.5"/>`;
+  const inset = Math.min(8, w / 6, h / 6);
+  if (p.sanca) s += `<rect x="${x + inset}" y="${y + inset}" width="${w - inset * 2}" height="${h - inset * 2}" fill="none" stroke="#A8895F" stroke-width="2" stroke-dasharray="4 3"/>`;
+  if (p.moldura) s += `<rect x="${x + 2.5}" y="${y + 2.5}" width="${w - 5}" height="${h - 5}" fill="none" stroke="#C4A882" stroke-width="1.5"/>`;
+  if (p.linha) s += `<line x1="${x + 4}" y1="${y + h - 4}" x2="${x + w - 4}" y2="${y + h - 4}" stroke="#6b5534" stroke-width="2.5"/>`;
+  p.paredes.forEach((comp, i) => {
+    const len = Math.min(w, comp * sc), yy = y + h * (i + 1) / (p.paredes.length + 1);
+    s += `<line x1="${x}" y1="${yy}" x2="${x + len}" y2="${yy}" stroke="#555" stroke-width="5"/>`;
+  });
+  if (p.spots) {
+    const cols = Math.ceil(Math.sqrt(p.spots * w / h)), rows = Math.ceil(p.spots / cols);
+    for (let i = 0; i < p.spots; i++) {
+      const cx = x + w * ((i % cols) + 1) / (cols + 1), cy = y + h * (Math.floor(i / cols) + 1) / (rows + 1);
+      s += `<circle cx="${cx}" cy="${cy}" r="2.6" fill="#1e1e1e"/>`;
+    }
+  }
+  s += `<text x="${x + w / 2}" y="${y - 6}" text-anchor="middle" font-size="12" font-weight="800" fill="#1e1e1e">${fmt(p.g.L)} m</text>`;
+  s += `<text x="${x - 6}" y="${y + h / 2}" text-anchor="middle" font-size="12" font-weight="800" fill="#1e1e1e" transform="rotate(-90 ${x - 6} ${y + h / 2})">${fmt(p.g.C)} m</text>`;
+  return s + '</svg>';
+}
+
+/* ════════════ Passos ════════════ */
+function goStep(n) {
+  ui.step = n; saveUI();
+  $$('.step').forEach((s) => s.classList.toggle('on', +s.dataset.step === n));
+  $$('.steps button').forEach((b) => {
+    const k = +b.dataset.go;
+    b.classList.toggle('on', k === n);
+    b.classList.toggle('done', k < n);
+  });
+  $('#bar-back').style.display = n === 1 ? 'none' : '';
+  $('#bar-next').style.display = n === 3 ? 'none' : '';
+  
+  if (n === 3) renderSummary();
+  window.scrollTo(0, 0);
+}
+$$('.steps button').forEach((b) => b.addEventListener('click', () => tryGo(+b.dataset.go)));
+$('#bar-back').addEventListener('click', () => goStep(Math.max(1, ui.step - 1)));
+$('#bar-next').addEventListener('click', () => tryGo(ui.step + 1));
+
+function tryGo(n) {
+  if (n === 3 && !calc(q).subtotal) {
+    goStep(2);
+    toast('Digite as medidas e escolha pelo menos um serviço.');
+    return;
+  }
+  goStep(n);
+}
+
+/* ════════════ Passo 1 e 3: campos ════════════ */
+function renderQuote() {
+  $('#c-nome').value = q.cliente.nome;
+  $('#c-tel').value = q.cliente.tel;
+  $('#c-end').value = q.cliente.end;
+  $('#q-desloc').value = q.deslocamento == null ? '' : q.deslocamento;
+  $('#q-desloc').placeholder = dec(cfg.orcamento.deslocamento);
+  $('#q-desc').value = q.desconto || '';
+  $('#q-obs').value = q.obs;
+  $('#q-mostrarmat').checked = !!q.mostrarMateriais;
+  $('#q-numero').textContent = q.numero ? `Orçamento nº ${q.numero} (já guardado)` : '';
+  renderRooms();
+  goStep(ui.step || 1);
+}
+
+const bindClient = (sel, key) => $(sel).addEventListener('input', (e) => { q.cliente[key] = e.target.value; saveDraft(); });
+bindClient('#c-nome', 'nome'); bindClient('#c-tel', 'tel'); bindClient('#c-end', 'end');
+$('#q-desloc').addEventListener('input', (e) => { q.deslocamento = e.target.value === '' ? null : e.target.value; refreshTotals(); renderSummary(); });
+$('#q-desc').addEventListener('input', (e) => { q.desconto = e.target.value; refreshTotals(); renderSummary(); });
+$('#q-obs').addEventListener('input', (e) => { q.obs = e.target.value; saveDraft(); });
+$('#q-mostrarmat').addEventListener('change', (e) => { q.mostrarMateriais = e.target.checked; saveDraft(); });
+
+/* ════════════ Passo 2: cômodos ════════════ */
+const NOMES = ['Sala', 'Quarto', 'Cozinha', 'Banheiro', 'Escritório', 'Varanda', 'Corredor'];
+
+function renderRooms() {
+  const ativos = cfg.servicos.filter((s) => s.ativo !== false);
+  $('#rooms').innerHTML = q.ambientes.map((r, ri) => {
+    const g = roomGeo(r);
+    const outro = !NOMES.some((n) => r.nome === n || r.nome.startsWith(n + ' '));
+    const naLista = cfg.servicos.filter((s) => r.itens.some((it) => it.servicoId === s.id) && s.ativo === false);
+    return `
+    <div class="card room" data-room="${r.id}">
+      <div class="room-title">
+        <span class="n">${ri + 1}. ${esc(r.nome || 'Cômodo')}</span>
+        ${q.ambientes.length > 1 ? '<button class="link red" data-act="del-room">Apagar cômodo</button>' : ''}
+      </div>
+      <div class="chips">
+        ${NOMES.map((n) => `<button data-act="nome" data-v="${n}" class="${r.nome === n ? 'on' : ''}">${n}</button>`).join('')}
+        <button data-act="nome-outro" class="${outro ? 'on' : ''}">Outro…</button>
+      </div>
+      ${outro ? `<label class="f">Nome do cômodo<input data-r="nome" value="${esc(r.nome)}" placeholder="Ex.: Quarto do casal"></label>` : ''}
+      <div class="measure">
+        <label class="f">Largura (metros)<input data-r="largura" inputmode="decimal" value="${esc(dec(r.largura))}" placeholder="0,00"></label>
+        <label class="f">Comprimento (metros)<input data-r="comprimento" inputmode="decimal" value="${esc(dec(r.comprimento))}" placeholder="0,00"></label>
+      </div>
+      <div class="area-box">
+        <div data-plan>${planSVG(r)}</div>
+        <div class="nums">
+          <div>Área do teto: <b data-m="area">${fmt(g.area)} m²</b></div>
+          <div>Volta do cômodo: <b data-m="perim">${fmt(g.perim)} m</b></div>
+          <div>Valor deste cômodo: <b data-m="total">${brl(0)}</b></div>
+        </div>
+      </div>
+      <p class="q">O que vai fazer neste cômodo?</p>
+      <div class="svc-grid">
+        ${ativos.concat(naLista).map((s) => {
+          const on = r.itens.some((it) => it.servicoId === s.id);
+          return `<button class="svc-btn ${on ? 'on' : ''}" data-act="toggle" data-s="${esc(s.id)}" aria-pressed="${on}"><span class="ck">✓</span>${esc(curto(s))}</button>`;
+        }).join('')}
+      </div>
+      <div class="items">${r.itens.map((it, ii) => itemHTML(r, it, ii)).join('')}</div>
+    </div>`;
+  }).join('');
+  refreshTotals();
+}
+
+function stepper(field, val, label) {
+  return `<div class="stp-line"><span>${label}</span>
+    <div class="stepper"><button data-act="dec" data-f="${field}" aria-label="Menos">−</button><input data-i="${field}" inputmode="numeric" value="${esc(val || 0)}"><button data-act="inc" data-f="${field}" aria-label="Mais">+</button></div></div>`;
+}
+
+function itemHTML(r, it, ii) {
+  const s = svcById(it.servicoId) || { nome: 'Serviço removido', unidade: '', base: 'manual', preco: 0 };
+  const qty = itemQty(it, r);
+  const key = r.id + ':' + ii;
+  const aberto = openMore.has(key);
+  let body = '';
+  if (s.base === 'manual') {
+    body = s.unidade === 'un'
+      ? stepper('qtd', it.qtd, 'Quantos?')
+      : `<div class="num-line"><span>Quantos ${UN_TXT[s.unidade] || s.unidade}?</span><input data-i="qtd" inputmode="decimal" value="${esc(dec(it.qtd))}" placeholder="0"></div>`;
+  } else if (s.base === 'parede') {
+    body = `
+      <div class="num-line"><span>Comprimento da parede (m)</span><input data-i="paredeComp" inputmode="decimal" value="${esc(dec(it.paredeComp == null ? '' : it.paredeComp))}" placeholder="${dec(num(r.largura)) || '0'}"></div>
+      <div class="num-line"><span>Altura da parede (m)</span><input data-r="peDireito" inputmode="decimal" value="${esc(dec(r.peDireito))}"></div>
+      ${stepper('portas', it.portas, 'Portas')}
+      ${stepper('janelas', it.janelas, 'Janelas')}
+      <p class="calc">Se forem várias paredes, some os comprimentos.</p>`;
+  }
+  const calcTxt = s.base === 'manual' ? '' : `<p class="calc" data-m="qtxt">${qtyText(s, it, r, qty)}</p>`;
+  const more = aberto ? `
+    <div class="more">
+      ${s.base !== 'manual' ? `<div class="num-line"><span>Quantidade (${esc(s.unidade)})</span><input data-i="qtd" inputmode="decimal" value="${esc(dec(it.manual ? it.qtd : r2(qty)))}"></div>` : ''}
+      <div class="num-line"><span>Preço só neste orçamento (R$/${esc(s.unidade)})</span><input data-i="preco" inputmode="decimal" value="${esc(dec(it.preco == null ? '' : it.preco))}" placeholder="${dec(num(s.preco))}"></div>
+      ${it.manual ? '<button class="link" data-act="auto">Voltar para a conta automática</button>' : ''}
+    </div>` : '';
+  return `
+  <div class="item" data-item="${ii}">
+    <div class="item-h"><b>${esc(s.nome)}</b><span class="v" data-m="sub">${brl(r2(qty * itemPrice(it)))}</span></div>
+    ${calcTxt}
+    ${body}
+    ${more}
+    <div class="row">
+      <button class="link" data-act="more">${aberto ? 'Fechar' : '✎ Mudar'}</button>
+      <button class="link red" data-act="del-item">✕ Tirar</button>
+    </div>
+  </div>`;
+}
+
+function qtyText(s, it, r, qty) {
+  const pr = brl(itemPrice(it));
+  if (it.manual) return `${fmt(qty)} ${s.unidade} (digitado) × ${pr}`;
+  const g = roomGeo(r);
+  if (s.base === 'area') return `${fmt(g.L)} × ${fmt(g.C)} = ${fmt(qty)} m² × ${pr}`;
+  if (s.base === 'perimetro') return `Volta do cômodo: ${fmt(qty)} m × ${pr}`;
+  if (s.base === 'parede') return `Parede: ${fmt(qty)} m² × ${pr}`;
+  return '';
+}
+
+// Atualiza números sem redesenhar os campos (o teclado continua aberto).
+function refreshRoom(el, r) {
+  const g = roomGeo(r);
+  $('[data-m="area"]', el).textContent = fmt(g.area) + ' m²';
+  $('[data-m="perim"]', el).textContent = fmt(g.perim) + ' m';
+  $('[data-plan]', el).innerHTML = planSVG(r);
+  r.itens.forEach((it, ii) => {
+    const row = $(`[data-item="${ii}"]`, el); if (!row) return;
+    const s = svcById(it.servicoId);
+    const qty = itemQty(it, r);
+    $('[data-m="sub"]', row).textContent = brl(r2(qty * itemPrice(it)));
+    const qt = $('[data-m="qtxt"]', row);
+    if (qt && s) qt.textContent = qtyText(s, it, r, qty);
+  });
+}
+
+function refreshTotals() {
+  const c = calc(q);
+  c.ambientes.forEach((a) => {
+    const el = $(`[data-room="${a.r.id}"]`);
+    if (el) $('[data-m="total"]', el).textContent = brl(a.total);
+  });
+  $('#bar-total').textContent = brl(c.total);
+  $('#bar-info').textContent = `Total (${plural(q.ambientes.length, 'cômodo', 'cômodos')})`;
+  saveDraft();
+  return c;
+}
+
+function renderSummary() {
+  const c = calc(q);
+  $('#s3-lead').textContent = q.cliente.nome ? `Orçamento para ${q.cliente.nome}.` : 'Volte no passo 1 e coloque o nome do cliente.';
+  $('#big-total').innerHTML = `<span>Valor total</span><b>${brl(c.total)}</b>${c.dias ? `<small>Prazo: mais ou menos ${plural(c.dias, 'dia', 'dias')} de serviço</small>` : ''}`;
+  let h = '';
+  c.ambientes.forEach((a) => {
+    if (!a.itens.length) return;
+    h += `<div class="sum-line"><b>${esc(a.r.nome)}</b><b>${brl(a.total)}</b></div>`;
+    a.itens.forEach((x) => { h += `<div class="sum-line sub"><span>${esc(curto(x.s || { nome: x.nome }))} · ${fmt(x.qtd)} ${esc(x.unidade)}</span><span>${brl(x.sub)}</span></div>`; });
+  });
+  if (c.desconto) h += `<div class="sum-line"><span>Desconto (${fmt(c.descPct)}%)</span><span style="color:var(--ok)">− ${brl(c.desconto)}</span></div>`;
+  if (c.desloc) h += `<div class="sum-line"><span>Deslocamento</span><span>${brl(c.desloc)}</span></div>`;
+  if (c.ajusteMinimo) h += `<div class="sum-line"><span>Completa o valor mínimo</span><span>${brl(c.ajusteMinimo)}</span></div>`;
+  $('#summary').innerHTML = h || '<p class="hint">Nenhum serviço ainda.</p>';
+  $('#materials').innerHTML = c.materiais.length
+    ? `<table class="mat">${c.materiais.map((m) => `<tr><td>${esc(m.nome)}</td><td>${m.qtd} ${esc(m.un)}</td></tr>`).join('')}</table>
+       <p class="hint" style="margin-top:8px">Já tem ${fmt(num(cfg.orcamento.perda))}% a mais de sobra.</p>`
+    : '<p class="hint">Sem materiais.</p>';
+}
+
+/* Eventos do passo 2 */
+$('#add-room').addEventListener('click', () => {
+  q.ambientes.push(newRoom('Quarto'));
+  renderRooms();
+  const last = $$('.room').pop();
+  last.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+$('#rooms').addEventListener('input', (e) => {
+  const el = e.target.closest('.room'); if (!el) return;
+  const r = q.ambientes.find((x) => x.id === el.dataset.room);
+  const rk = e.target.dataset.r, ik = e.target.dataset.i;
+  if (rk) {
+    r[rk] = e.target.value;
+    if (rk === 'nome') $('.room-title .n', el).textContent = `${q.ambientes.indexOf(r) + 1}. ${r.nome}`;
+  }
+  if (ik) {
+    const it = r.itens[+e.target.closest('.item').dataset.item];
+    const s = svcById(it.servicoId);
+    if (ik === 'qtd') {
+      it.qtd = e.target.value;
+      if (s && s.base !== 'manual') it.manual = true;
+    } else {
+      it[ik] = e.target.value === '' ? null : e.target.value;
+    }
+  }
+  refreshRoom(el, r);
+  refreshTotals();
+});
+
+$('#rooms').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-act]'); if (!btn) return;
+  const act = btn.dataset.act;
+  const el = btn.closest('.room');
+  const r = q.ambientes.find((x) => x.id === el.dataset.room);
+  const itEl = btn.closest('.item');
+  const ii = itEl ? +itEl.dataset.item : -1;
+  const it = ii >= 0 ? r.itens[ii] : null;
+
+  if (act === 'nome') { r.nome = btn.dataset.v; renderRooms(); }
+  else if (act === 'nome-outro') { r.nome = ''; renderRooms(); $(`[data-room="${r.id}"] [data-r="nome"]`).focus(); }
+  else if (act === 'del-room') {
+    if (!confirm(`Apagar o cômodo "${r.nome}"?`)) return;
+    q.ambientes = q.ambientes.filter((x) => x !== r); openMore.clear(); renderRooms();
+  } else if (act === 'toggle') {
+    const id = btn.dataset.s;
+    const i = r.itens.findIndex((x) => x.servicoId === id);
+    if (i >= 0) r.itens.splice(i, 1);
+    else r.itens.push({ servicoId: id, qtd: '', manual: false, preco: null, paredeComp: null, portas: 0, janelas: 0 });
+    openMore.clear(); renderRooms();
+    if (i < 0) {
+      const s = svcById(id);
+      const box = $$(`[data-room="${r.id}"] .item`).pop();
+      if (!num(r.largura) || !num(r.comprimento)) {
+        if (s.base !== 'manual') toast('Agora digite a largura e o comprimento.');
+      }
+      if (s.base === 'manual' && s.unidade !== 'un') $('[data-i="qtd"]', box).focus();
+    }
+  } else if (act === 'del-item') {
+    r.itens.splice(ii, 1); openMore.clear(); renderRooms();
+  } else if (act === 'more') {
+    const key = r.id + ':' + ii;
+    openMore.has(key) ? openMore.delete(key) : openMore.add(key);
+    renderRooms();
+  } else if (act === 'auto') {
+    it.manual = false; it.qtd = ''; renderRooms();
+  } else if (act === 'inc' || act === 'dec') {
+    const f = btn.dataset.f;
+    it[f] = Math.max(0, num(it[f]) + (act === 'inc' ? 1 : -1));
+    $(`[data-i="${f}"]`, itEl).value = it[f];
+    refreshRoom(el, r); refreshTotals();
+  }
+});
+
+$('#new-quote').addEventListener('click', () => {
+  if (!confirm('Começar um orçamento novo?')) return;
+  q = newQuote(); openMore.clear(); ui.step = 1; renderQuote();
+});
+
+/* ════════════ Guardar ════════════ */
+function saveQuote() {
+  if (!q.cliente.nome.trim()) {
+    toast('Falta o nome do cliente.');
+    goStep(1); setTimeout(() => $('#c-nome').focus(), 300);
+    return false;
+  }
+  const c = calc(q);
+  if (!c.subtotal) { toast('Escolha pelo menos um serviço.'); goStep(2); return false; }
+  if (!q.numero) {
+    const ano = (q.cliente.data || today()).slice(0, 4);
+    q.numero = numeroFmt(num(cfg.orcamento.proximoNumero) || 1, ano);
+    cfg.orcamento.proximoNumero = (num(cfg.orcamento.proximoNumero) || 1) + 1;
+    saveCfg();
+  }
+  q.total = c.total; q.atualizadoEm = Date.now();
+  const i = hist.findIndex((h) => h.id === q.id);
+  if (i >= 0) hist[i] = clone(q); else hist.unshift(clone(q));
+  store(KEY_HIST, hist); saveDraft();
+  $('#q-numero').textContent = `Orçamento nº ${q.numero} (já guardado)`;
+  return true;
+}
+
+/* ════════════ Meus orçamentos ════════════ */
+const STATUS = [['pendente', 'Esperando'], ['aprovado', 'Fechou'], ['recusado', 'Não fechou']];
+function renderHist() {
+  const busca = $('#h-busca').value.trim().toLowerCase();
+  const list = hist.filter((h) => !busca || (h.cliente.nome || '').toLowerCase().includes(busca) || (h.numero || '').includes(busca));
+  const n = (st) => hist.filter((h) => h.status === st).length;
+  const sum = (st) => hist.filter((h) => h.status === st).reduce((a, h) => a + num(h.total), 0);
+  $('#stats').innerHTML = `
+    <div class="stat"><span>Esperando resposta</span><b>${n('pendente')}</b><span>${brl(sum('pendente'))}</span></div>
+    <div class="stat"><span>Fechados</span><b style="color:var(--ok)">${n('aprovado')}</b><span>${brl(sum('aprovado'))}</span></div>`;
+  $('#hist-list').innerHTML = list.length ? list.map((h) => `
+    <div class="hist" data-h="${h.id}">
+      <div class="t"><b>${esc(h.cliente.nome)}</b><span class="v">${brl(num(h.total))}</span></div>
+      <div class="m">Nº ${esc(h.numero)} · ${dataBR(h.cliente.data)} · ${plural(h.ambientes.length, 'cômodo', 'cômodos')}</div>
+      <div class="seg">${STATUS.map(([v, t]) => `<button data-act="status" data-v="${v}" class="${h.status === v ? 'on' : ''}">${t}</button>`).join('')}</div>
+      <div class="acts">
+        <button class="btn sm" data-act="open">Abrir</button>
+        <button class="btn sm wa" data-act="send">Enviar de novo</button>
+        <button class="btn sm ghost" data-act="dup">Usar como modelo</button>
+        <button class="btn sm danger" data-act="del">Apagar</button>
+      </div>
+    </div>`).join('') : `<div class="empty">${hist.length ? 'Não achei esse cliente.' : 'Nenhum orçamento ainda.<br>Os orçamentos enviados aparecem aqui.'}</div>`;
+}
+$('#h-busca').addEventListener('input', renderHist);
+$('#h-novo').addEventListener('click', () => { q = newQuote(); openMore.clear(); ui.step = 1; showTab('novo'); });
+$('#hist-list').addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-act]'); if (!btn) return;
+  const act = btn.dataset.act;
+  const h = hist.find((x) => x.id === btn.closest('.hist').dataset.h);
+  if (act === 'status') {
+    h.status = btn.dataset.v; store(KEY_HIST, hist);
+    if (q.id === h.id) { q.status = h.status; saveDraft(); }
+    renderHist();
+    if (h.status === 'aprovado') toast('Parabéns! Serviço fechado.');
+  } else if (act === 'open') { q = clone(h); openMore.clear(); ui.step = 3; showTab('novo'); }
+  else if (act === 'send') { await sharePDF(h); }
+  else if (act === 'dup') {
+    q = clone(h); q.id = uid(); q.numero = null; q.status = 'pendente'; q.criadoEm = Date.now();
+    q.cliente = { nome: '', tel: '', end: '', data: today() };
+    openMore.clear(); ui.step = 1; showTab('novo');
+    toast('Copiei as medidas. Coloque o nome do novo cliente.');
+  } else if (act === 'del') {
+    if (!confirm(`Apagar o orçamento de ${h.cliente.nome}? Não dá para desfazer.`)) return;
+    hist = hist.filter((x) => x !== h); store(KEY_HIST, hist); renderHist();
+  }
+});
+
+/* ════════════ PDF ════════════ */
+const GOLD = [196, 168, 130], GOLD_D = [168, 137, 95], DARK = [30, 30, 30], MUTED = [119, 113, 106], LIGHT = [247, 245, 242];
+
+function drawPlanPDF(doc, r, X, Y, W, H) {
+  const p = planShapes(r);
+  doc.setFillColor(...LIGHT); doc.setDrawColor(220, 214, 205); doc.setLineWidth(0.2);
+  doc.roundedRect(X, Y, W, H, 2, 2, 'FD');
+  if (!p.g.L || !p.g.C) return;
+  const pad = 9, sc = Math.min((W - pad * 2) / p.g.L, (H - pad * 2) / p.g.C);
+  const w = p.g.L * sc, h = p.g.C * sc, x = X + (W - w) / 2, y = Y + (H - h) / 2;
+  doc.setFillColor(...(p.forro ? [237, 226, 211] : [255, 255, 255]));
+  doc.setDrawColor(...DARK); doc.setLineWidth(0.8);
+  doc.rect(x, y, w, h, 'FD');
+  const inset = Math.min(3, w / 6, h / 6);
+  if (p.sanca) { doc.setDrawColor(...GOLD_D); doc.setLineWidth(0.6); doc.setLineDashPattern([1.5, 1], 0); doc.rect(x + inset, y + inset, w - inset * 2, h - inset * 2); doc.setLineDashPattern([], 0); }
+  if (p.moldura) { doc.setDrawColor(...GOLD); doc.setLineWidth(0.5); doc.rect(x + 1, y + 1, w - 2, h - 2); }
+  if (p.linha) { doc.setDrawColor(107, 85, 52); doc.setLineWidth(0.8); doc.line(x + 1.5, y + h - 1.5, x + w - 1.5, y + h - 1.5); }
+  p.paredes.forEach((comp, i) => {
+    const len = Math.min(w, comp * sc), yy = y + h * (i + 1) / (p.paredes.length + 1);
+    doc.setDrawColor(85, 85, 85); doc.setLineWidth(1.6); doc.line(x, yy, x + len, yy);
+  });
+  if (p.spots) {
+    doc.setFillColor(...DARK);
+    const cols = Math.ceil(Math.sqrt(p.spots * w / h)), rows = Math.ceil(p.spots / cols);
+    for (let i = 0; i < p.spots; i++) doc.circle(x + w * ((i % cols) + 1) / (cols + 1), y + h * (Math.floor(i / cols) + 1) / (rows + 1), 0.8, 'F');
+  }
+  doc.setTextColor(...DARK); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+  doc.text(`${fmt(p.g.L)} m`, x + w / 2, y - 2, { align: 'center' });
+  doc.text(`${fmt(p.g.C)} m`, x - 2, y + h / 2, { align: 'center', angle: 90 });
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(...MUTED);
+  doc.text(`${fmt(p.g.area)} m²`, x + w / 2, y + h + 4, { align: 'center' });
+}
+
+function planLegend(r) {
+  const p = planShapes(r), l = [];
+  if (p.forro) l.push('hachurado: forro');
+  if (p.sanca) l.push('tracejado: sanca');
+  if (p.moldura) l.push('contorno: moldura');
+  if (p.paredes.length) l.push('linha grossa: parede drywall');
+  if (p.spots) l.push('pontos: spots');
+  return l.join(' | ');
+}
+
+async function makePDF(quote) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const E = cfg.empresa, O = cfg.orcamento, c = calc(quote);
+  const PW = 210, M = 14;
+  const numero = quote.numero || 'RASCUNHO';
+
+  // Cabeçalho
+  doc.setFillColor(...DARK); doc.rect(0, 0, PW, 34, 'F');
+  doc.setFillColor(...GOLD); doc.rect(0, 34, PW, 1.2, 'F');
+  doc.setTextColor(...GOLD); doc.setFont('helvetica', 'bold'); doc.setFontSize(17);
+  doc.text(E.nome.toUpperCase(), M, 14);
+  doc.setTextColor(220, 220, 220); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+  const contato = [E.responsavel, E.telefone, E.email].filter(Boolean).join('  |  ');
+  const contato2 = [E.endereco, E.site, E.documento ? 'CNPJ/CPF ' + E.documento : ''].filter(Boolean).join('  |  ');
+  doc.text(contato, M, 21); doc.text(contato2, M, 26);
+  doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+  doc.text('ORÇAMENTO', PW - M, 13, { align: 'right' });
+  doc.setTextColor(...GOLD); doc.setFontSize(13);
+  doc.text('Nº ' + numero, PW - M, 20, { align: 'right' });
+
+  // Cliente
+  let y = 44;
+  const dt = quote.cliente.data || today();
+  const val = new Date(dt + 'T12:00:00'); val.setDate(val.getDate() + (num(O.validadeDias) || 15));
+  doc.setTextColor(...MUTED); doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+  doc.text('CLIENTE', M, y); doc.text('DATA', 130, y); doc.text('VÁLIDO ATÉ', 165, y);
+  doc.setTextColor(...DARK); doc.setFontSize(11);
+  doc.text(quote.cliente.nome || '-', M, y + 5.5);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  doc.text(dataBR(dt), 130, y + 5.5);
+  doc.text(val.toLocaleDateString('pt-BR'), 165, y + 5.5);
+  doc.setFontSize(9); doc.setTextColor(...MUTED);
+  const cl2 = [quote.cliente.tel, quote.cliente.end].filter(Boolean).join('  |  ');
+  if (cl2) doc.text(doc.splitTextToSize(cl2, 110), M, y + 10.5);
+  y += 18;
+
+  // Ambientes
+  const PLAN = 46;
+  for (const a of c.ambientes) {
+    if (!a.itens.length) continue;
+    const need = 14 + Math.max(PLAN, 10 + a.itens.length * 7);
+    if (y + need > 270) { doc.addPage(); y = 18; }
+    doc.setFillColor(...GOLD); doc.rect(M, y, 1.4, 6, 'F');
+    doc.setTextColor(...DARK); doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5);
+    doc.text(a.r.nome || 'Ambiente', M + 4, y + 4.6);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(...MUTED);
+    const dims = a.g.L && a.g.C ? `${fmt(a.g.L)} × ${fmt(a.g.C)} m  |  área ${fmt(a.g.area)} m²  |  perímetro ${fmt(a.g.perim)} m  |  pé-direito ${fmt(a.g.pe)} m` : '';
+    doc.text(dims, M + 4 + doc.getTextWidth(a.r.nome || 'Ambiente') * 11.5 / 8.5 + 4, y + 4.6);
+    y += 9;
+    const top = y;
+    const hasPlan = a.g.L && a.g.C;
+    const tableW = hasPlan ? PW - M * 2 - PLAN - 5 : PW - M * 2;
+    doc.autoTable({
+      startY: y, margin: { left: M, right: hasPlan ? PW - M - tableW : M },
+      head: [['Serviço', 'Qtd', 'Valor unit.', 'Subtotal']],
+      body: a.itens.map((x) => [x.nome, `${fmt(x.qtd)} ${x.unidade}`, brl(x.preco), brl(x.sub)]),
+      foot: [['', '', 'Total', brl(a.total)]],
+      theme: 'plain', styles: { font: 'helvetica', fontSize: 8.8, cellPadding: { top: 1.8, bottom: 1.8, left: 1.5, right: 1.5 }, textColor: DARK },
+      headStyles: { fontStyle: 'bold', fontSize: 7.5, textColor: MUTED, lineWidth: { bottom: 0.3 }, lineColor: [220, 214, 205] },
+      footStyles: { fontStyle: 'bold', textColor: DARK, lineWidth: { top: 0.3 }, lineColor: [220, 214, 205] },
+      bodyStyles: { lineWidth: { bottom: 0.1 }, lineColor: [235, 230, 223] },
+      columnStyles: { 1: { halign: 'right', cellWidth: 22 }, 2: { halign: 'right', cellWidth: 24 }, 3: { halign: 'right', cellWidth: 26 } },
+      didParseCell: (d) => { if (d.column.index > 0 && d.section !== 'body') d.cell.styles.halign = 'right'; },
+    });
+    let endY = doc.lastAutoTable.finalY;
+    if (hasPlan) {
+      drawPlanPDF(doc, a.r, PW - M - PLAN, top, PLAN, PLAN - 4);
+      const leg = planLegend(a.r);
+      if (leg) { doc.setFontSize(6); doc.setTextColor(...MUTED); doc.text(doc.splitTextToSize(leg, PLAN), PW - M - PLAN, top + PLAN, {}); }
+      endY = Math.max(endY, top + PLAN + 4);
+    }
+    y = endY + 7;
+  }
+
+  // Resumo
+  const resumo = [['Subtotal dos serviços', brl(c.subtotal)]];
+  if (c.desconto) resumo.push([`Desconto (${fmt(c.descPct)}%)`, '- ' + brl(c.desconto)]);
+  if (c.desloc) resumo.push(['Deslocamento', brl(c.desloc)]);
+  if (c.ajusteMinimo) resumo.push(['Ajuste para valor mínimo de serviço', brl(c.ajusteMinimo)]);
+  if (y + 20 + resumo.length * 7 > 275) { doc.addPage(); y = 18; }
+  doc.autoTable({
+    startY: y, margin: { left: 100, right: M },
+    body: resumo, theme: 'plain',
+    styles: { fontSize: 9.5, cellPadding: 1.6, textColor: DARK },
+    columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
+  });
+  y = doc.lastAutoTable.finalY + 2;
+  doc.setFillColor(...DARK); doc.roundedRect(100, y, PW - M - 100, 12, 2, 2, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+  doc.text('TOTAL', 104, y + 7.8);
+  doc.setTextColor(...GOLD); doc.setFontSize(14);
+  doc.text(brl(c.total), PW - M - 4, y + 8, { align: 'right' });
+  if (c.dias) {
+    doc.setTextColor(...MUTED); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+    doc.text(`Prazo estimado de execução: ${c.dias} ${c.dias > 1 ? 'dias úteis' : 'dia útil'}`, PW - M, y + 17, { align: 'right' });
+  }
+  y += 24;
+
+  // Materiais (opcional)
+  if (quote.mostrarMateriais && c.materiais.length) {
+    if (y + 20 > 270) { doc.addPage(); y = 18; }
+    doc.setTextColor(...DARK); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+    doc.text('Materiais previstos', M, y); y += 2;
+    doc.autoTable({
+      startY: y, margin: { left: M, right: M }, theme: 'plain',
+      head: [['Material', 'Quantidade']],
+      body: c.materiais.map((m) => [m.nome, `${m.qtd} ${m.un}`]),
+      styles: { fontSize: 8.5, cellPadding: 1.4, textColor: DARK },
+      headStyles: { fontStyle: 'bold', fontSize: 7.5, textColor: MUTED, lineWidth: { bottom: 0.3 }, lineColor: [220, 214, 205] },
+      columnStyles: { 1: { halign: 'right', cellWidth: 35 } },
+      didParseCell: (d) => { if (d.column.index === 1) d.cell.styles.halign = 'right'; },
+    });
+    y = doc.lastAutoTable.finalY + 7;
+  }
+
+  // Condições
+  const blocos = [
+    ['Forma de pagamento', O.pagamento + (E.pix ? `\nChave PIX: ${E.pix}` : '')],
+    ['Condições', O.condicoes],
+  ];
+  if (quote.obs) blocos.push(['Observações', quote.obs]);
+  for (const [tit, txt] of blocos) {
+    if (!txt) continue;
+    const lines = doc.splitTextToSize(txt, PW - M * 2);
+    if (y + 8 + lines.length * 4 > 270) { doc.addPage(); y = 18; }
+    doc.setTextColor(...DARK); doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
+    doc.text(tit, M, y);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.8); doc.setTextColor(70, 70, 70);
+    doc.text(lines, M, y + 5);
+    y += 7 + lines.length * 4;
+  }
+
+  // Assinaturas
+  if (y + 18 > 284) { doc.addPage(); y = 30; }
+  y += 12;
+  doc.setDrawColor(...MUTED); doc.setLineWidth(0.3);
+  doc.line(M, y, M + 75, y); doc.line(PW - M - 75, y, PW - M, y);
+  doc.setFontSize(8); doc.setTextColor(...MUTED);
+  doc.text(E.responsavel || E.nome, M, y + 4.5);
+  doc.text('De acordo: ' + (quote.cliente.nome || 'Cliente'), PW - M - 75, y + 4.5);
+
+  // Rodapé
+  const pages = doc.getNumberOfPages();
+  for (let i = 1; i <= pages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(7.5); doc.setTextColor(...MUTED);
+    doc.text(`${E.nome}  |  ${E.telefone}`, M, 290);
+    doc.text(`Página ${i} de ${pages}`, PW - M, 290, { align: 'right' });
+  }
+
+  const nomeArq = `Orcamento-${numero}-${(quote.cliente.nome || 'cliente').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w]+/g, '-').replace(/^-|-$/g, '')}.pdf`;
+  return { doc, name: nomeArq, total: c.total };
+}
+
+async function sharePDF(quote) {
+  const { doc, name, total } = await makePDF(quote);
+  const primeiro = (quote.cliente.nome || '').trim().split(' ')[0];
+  const msg = `Olá${primeiro ? ', ' + primeiro : ''}! Segue o orçamento nº ${quote.numero} da ${cfg.empresa.nome}, no valor de ${brl(total)}. Qualquer dúvida, estou à disposição. ${cfg.empresa.responsavel}`;
+  const file = new File([doc.output('blob')], name, { type: 'application/pdf' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: `Orçamento ${quote.numero}`, text: msg }); return; }
+    catch (e) { if (e.name === 'AbortError') return; }
+  }
+  // Computador ou celular sem compartilhamento: baixa o PDF e abre o WhatsApp com a mensagem pronta.
+  doc.save(name);
+  const tel = (quote.cliente.tel || '').replace(/\D/g, '');
+  const para = tel ? (tel.length <= 11 ? '55' + tel : tel) : '';
+  window.open(`https://wa.me/${para}?text=${encodeURIComponent(msg)}`, '_blank');
+  toast('O PDF foi baixado. Anexe ele na conversa do WhatsApp.');
+}
+
+$('#act-pdf').addEventListener('click', async () => {
+  if (!saveQuote()) return;
+  const { doc, name } = await makePDF(q);
+  doc.save(name); toast('PDF baixado e orçamento guardado.');
+});
+$('#act-share').addEventListener('click', async () => {
+  if (!saveQuote()) return;
+  await sharePDF(q);
+});
+
+/* ════════════ Meus preços ════════════ */
+function getPath(o, p) { return p.split('.').reduce((a, k) => a[k], o); }
+function setPath(o, p, v) { const ks = p.split('.'); const last = ks.pop(); ks.reduce((a, k) => a[k], o)[last] = v; }
+const NUM_CFG = ['orcamento.valorMinimo', 'orcamento.deslocamento', 'orcamento.perda', 'orcamento.validadeDias', 'orcamento.peDireito', 'orcamento.proximoNumero'];
+const POR = { 'm²': 'por m²', m: 'por metro', un: 'cada' };
+const faixa = (s) => { const m = (s.ref || '').match(/R\$ ?[\d.,]+ a R\$ ?[\d.,]+/); return m ? esc(m[0]) : ''; };
+
+function renderCfg() {
+  $$('[data-cfg]').forEach((el) => {
+    const v = getPath(cfg, el.dataset.cfg);
+    el.value = NUM_CFG.includes(el.dataset.cfg) ? dec(v) : v;
+  });
+  $('#price-list').innerHTML = cfg.servicos.map((s, i) => `
+    <div class="price-row ${s.ativo === false ? 'off' : ''}" data-s="${i}">
+      <div class="nm">${esc(curto(s))}${faixa(s) ? `<small>Mercado: ${faixa(s)}</small>` : ''}</div>
+      <label class="pr"><span>R$</span><input data-sk="preco" inputmode="decimal" value="${dec(s.preco)}" aria-label="Preço de ${esc(s.nome)}"><span class="un">${POR[s.unidade] || s.unidade}</span></label>
+    </div>`).join('');
+  $('#svc-list').innerHTML = cfg.servicos.map((s, i) => `
+    <details class="svc" data-s="${i}">
+      <summary>${esc(s.nome)}</summary>
+      <div class="body">
+        <label class="f">Nome completo (vai no PDF)<input data-sk="nome" value="${esc(s.nome)}"></label>
+        <label class="f">Nome curto (botão)<input data-sk="curto" value="${esc(curto(s))}"></label>
+        <div class="two" style="margin-bottom:14px">
+          <label class="f">Cobra por<select data-sk="unidade">${['m²', 'm', 'un'].map((u) => `<option ${s.unidade === u ? 'selected' : ''}>${u}</option>`).join('')}</select></label>
+          <label class="f">Faz por dia<input data-sk="produtividade" inputmode="decimal" value="${dec(s.produtividade || '')}"></label>
+        </div>
+        <label class="f">Como calcular<select data-sk="base">
+          ${[['area', 'Pela área do teto'], ['perimetro', 'Pela volta do cômodo'], ['parede', 'Parede (comprimento × altura)'], ['manual', 'Eu digito a quantidade']].map(([v, t]) => `<option value="${v}" ${s.base === v ? 'selected' : ''}>${t}</option>`).join('')}
+        </select></label>
+        <label class="f">Materiais (nome | unidade | quanto por ${esc(s.unidade)})
+          <textarea data-sk="materiais" rows="4">${esc((s.materiais || []).map((m) => `${m[0]} | ${m[1]} | ${dec(m[2])}`).join('\n'))}</textarea>
+        </label>
+        <label class="check"><input type="checkbox" data-sk="ativo" ${s.ativo !== false ? 'checked' : ''}> Mostrar no orçamento</label>
+        <button class="link red" data-act="svc-del" style="margin-top:8px">Apagar este serviço</button>
+      </div>
+    </details>`).join('');
+}
+
+$('#v-config').addEventListener('input', (e) => {
+  const k = e.target.dataset.cfg;
+  if (k) { setPath(cfg, k, NUM_CFG.includes(k) ? num(e.target.value) : e.target.value); saveCfg(); return; }
+  const sk = e.target.dataset.sk; if (!sk) return;
+  const holder = e.target.closest('[data-s]'); const s = cfg.servicos[+holder.dataset.s];
+  if (sk === 'preco' || sk === 'produtividade') s[sk] = num(e.target.value);
+  else if (sk === 'materiais') s.materiais = e.target.value.split('\n').map((l) => l.split('|').map((x) => x.trim())).filter((p) => p[0]).map((p) => [p[0], p[1] || 'un', num(p[2])]);
+  else if (sk === 'ativo') s.ativo = e.target.checked;
+  else s[sk] = e.target.value;
+  saveCfg();
+});
+$('#v-config').addEventListener('change', (e) => {
+  if (e.target.dataset.sk === 'ativo' || e.target.tagName === 'SELECT') e.target.dispatchEvent(new Event('input', { bubbles: true }));
+  if (e.target.dataset.sk && e.target.dataset.sk !== 'materiais') renderCfgKeepOpen();
+  if (e.target.dataset.sk === 'preco') toast('Preço guardado.');
+});
+function renderCfgKeepOpen() {
+  const open = $$('#svc-list details').map((d) => d.open);
+  const adv = $$('#v-config > details.box').map((d) => d.open);
+  renderCfg();
+  $$('#svc-list details').forEach((d, i) => { d.open = !!open[i]; });
+  $$('#v-config > details.box').forEach((d, i) => { d.open = !!adv[i]; });
+}
+
+$('#svc-list').addEventListener('click', (e) => {
+  if (e.target.dataset.act !== 'svc-del') return;
+  const i = +e.target.closest('details').dataset.s;
+  if (!confirm(`Apagar "${cfg.servicos[i].nome}"? Se quiser só esconder, desmarque "Mostrar no orçamento".`)) return;
+  cfg.servicos.splice(i, 1); saveCfg(); renderCfgKeepOpen();
+});
+$('#svc-add').addEventListener('click', () => {
+  cfg.servicos.push({ id: 'svc_' + uid(), nome: 'Serviço novo', curto: 'Serviço novo', unidade: 'm²', base: 'manual', preco: 0, produtividade: 10, tipo: 'outro', materiais: [], ativo: true });
+  saveCfg(); renderCfgKeepOpen();
+  const d = $$('#svc-list details').pop(); d.open = true; $('[data-sk="nome"]', d).select();
+});
+$('#svc-reajuste').addEventListener('click', () => {
+  const p = prompt('Aumentar todos os preços em quantos por cento?\n(Ex.: 5. Para baixar, use -5)', '5');
+  if (p == null || !num(p)) return;
+  const f = 1 + num(p) / 100;
+  if (f <= 0) return;
+  cfg.servicos.forEach((s) => { s.preco = r2(num(s.preco) * f); });
+  saveCfg(); renderCfgKeepOpen(); toast(`Pronto! Preços ${num(p) > 0 ? 'aumentados' : 'baixados'} ${fmt(Math.abs(num(p)))}%.`);
+});
+$('#cfg-reset').addEventListener('click', () => {
+  if (!confirm('Voltar todos os preços ao padrão? Seus orçamentos e seus dados continuam.')) return;
+  cfg.servicos = clone(DEFAULT_SERVICOS); saveCfg(); renderCfgKeepOpen(); toast('Preços padrão de volta.');
+});
+$('#bk-export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({ app: 'pacheco-orcamento', versao: 1, data: new Date().toISOString(), config: cfg, historico: hist }, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `pacheco-copia-${today()}.json`; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast('Cópia baixada.');
+});
+$('#bk-import').addEventListener('change', async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (d.app !== 'pacheco-orcamento') throw new Error();
+    if (!confirm(`Abrir a cópia de ${new Date(d.data).toLocaleDateString('pt-BR')} com ${d.historico.length} orçamentos? O que está agora no celular será trocado por ela.`)) return;
+    cfg = mergeCfg(d.config); hist = d.historico || [];
+    saveCfg(); store(KEY_HIST, hist); renderCfg(); toast('Cópia aberta com sucesso.');
+  } catch (err) { toast('Esse arquivo não é uma cópia do app.'); }
+  e.target.value = '';
+});
+
+/* ════════════ Abas e letra ════════════ */
+function showTab(t) {
+  $$('nav.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === t));
+  $$('.view').forEach((v) => v.classList.toggle('on', v.id === 'v-' + t));
+  document.body.classList.toggle('no-bar', t !== 'novo');
+  if (t === 'historico') renderHist();
+  if (t === 'config') renderCfg();
+  if (t === 'novo') renderQuote();
+  window.scrollTo(0, 0);
+}
+$$('nav.tabs button').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
+
+function applyFont() {
+  document.body.classList.toggle('big', !!ui.big);
+  $('#font-toggle').textContent = ui.big ? 'A−' : 'A+';
+}
+$('#font-toggle').addEventListener('click', () => { ui.big = !ui.big; saveUI(); applyFont(); });
+
+/* ════════════ App no celular (PWA) ════════════ */
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register('sw-orcamento.js', { scope: './orcamento.html' }).catch(() => {});
+}
+let installEvt = null;
+const instalado = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+function renderInstall() {
+  const box = $('#install');
+  if (instalado() || ui.installHide) { box.hidden = true; return; }
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (installEvt) {
+    $('#install-txt').textContent = 'Assim ele abre com um toque, igual aos outros aplicativos, e funciona até sem internet.';
+    $('#install-btn').hidden = false;
+  } else if (ios) {
+    $('#install-txt').innerHTML = 'No Safari, toque no botão <em>Compartilhar</em> (o quadrado com a seta para cima) e depois em <em>Adicionar à Tela de Início</em>.';
+    $('#install-btn').hidden = true;
+  } else {
+    $('#install-txt').innerHTML = 'No Chrome, toque nos <em>três pontinhos ⋮</em> lá em cima e depois em <em>Instalar app</em> ou <em>Adicionar à tela inicial</em>.';
+    $('#install-btn').hidden = true;
+  }
+  box.hidden = false;
+}
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; renderInstall(); });
+window.addEventListener('appinstalled', () => { installEvt = null; renderInstall(); toast('Pronto! O app está na tela do celular.'); });
+$('#install-btn').addEventListener('click', async () => {
+  if (!installEvt) return;
+  installEvt.prompt();
+  await installEvt.userChoice;
+  installEvt = null; renderInstall();
+});
+$('#install-no').addEventListener('click', () => { ui.installHide = true; saveUI(); renderInstall(); });
+
+q = load(KEY_DRAFT, null) || newQuote();
+renderInstall();
+applyFont();
+renderQuote();
+</script>
+</body>
+</html>
